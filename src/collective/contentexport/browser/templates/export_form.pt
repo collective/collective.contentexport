@@ -4,14 +4,15 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       lang="en"
       metal:use-macro="context/main_template/macros/master"
-      i18n:domain="kbo.webapp">
+      i18n:domain="collective.contentexport">
 <body>
 
 <metal:content-core fill-slot="main">
 
     <form tal:attributes="action string:${context/absolute_url}/@@export_view">
 
-      <h1 class="">Export</h1>
+      <h1 class=""
+          i18n:translate="">Export</h1>
 
       <p i18n:translate="">
         Export content in various formats.
@@ -19,27 +20,33 @@
 
       <div class="field">
         <label for="export_type">
-          Export Type
-          <span class="required horizontal" title="Erforderlich"> </span>
+          <span i18n:translate="">Export Type</span>
+          <span class="required horizontal"
+              i18n:domain="plone"
+              i18n:attributes="title title_required;"
+              title="Required">&nbsp;</span>
         </label>
         <select id="export_type" name="export_type">
-          <option selected="" value="" title="">Choose one</option>
-          <option value="xlsx" title="Excel 2010 File">Excel 2010 File</option>
-          <option title="CSV File" value="csv">CSV File</option>
-          <option title="JSON Dump" value="json">JSON Dump</option>
-          <option title="Images" value="images">Export images as zip</option>
-          <option title="Files" value="files">Export files as zip</option>
-          <option title="Relations" value="related">Export related files and images as zip</option>
+          <option selected="" value="" title="" i18n:translate="">Choose one</option>
+          <option value="xlsx" title="Excel 2010 File" i18n:translate="">Excel 2010 File</option>
+          <option title="CSV File" value="csv" i18n:translate="">CSV File</option>
+          <option title="JSON Dump" value="json" i18n:translate="">JSON Dump</option>
+          <option title="Images" value="images" i18n:translate="">Export images as zip</option>
+          <option title="Files" value="files" i18n:translate="">Export files as zip</option>
+          <option title="Relations" value="related" i18n:translate="">Export related files and images as zip</option>
         </select>
       </div>
 
       <div class="field">
         <label for="portal_type">
-          Content Type to export
-          <span class="required horizontal" title="Erforderlich"> </span>
+          <span i18n:translate="">Content Type to export</span>
+          <span class="required horizontal"
+              i18n:domain="plone"
+              i18n:attributes="title title_required;"
+              title="Required">&nbsp;</span>
         </label>
         <select id="portal_type" name="portal_type">
-          <option selected="" value="" title="">Choose one</option>
+          <option selected="" value="" title="" i18n:translate="">Choose one</option>
           <option tal:repeat="ptype view/portal_types"
                   tal:content="string:${ptype/title} (${ptype/number})"
                   tal:attributes="value ptype/value; title ptype/title;">
@@ -48,16 +55,16 @@
       </div>
 
       <div class="field">
-        <label for="blob_format">Image and File Format</label>
+        <label for="blob_format" i18n:translate="">Image and File Format</label>
         <select id="blob_format" name="blob_format">
-          <option selected="" value="url" title="url">URL</option>
-          <option title="base64" value="base64">Base64-encoded string</option>
-          <option title="zip_path" value="zip_path">Location within the a zip</option>
+          <option selected="" value="url" title="url" i18n:translate="">URL</option>
+          <option title="base64" value="base64" i18n:translate="">Base64-encoded string</option>
+          <option title="zip_path" value="zip_path" i18n:translate="">Location within the a zip</option>
         </select>
       </div>
 
       <div class="field">
-        <label for="richtext_format">Richtext Format</label>
+        <label for="richtext_format" i18n:translate="">Richtext Format</label>
         <select id="richtext_format" name="richtext_format">
           <option selected="" value="html" title="html">html</option>
           <option title="text/plain" value="text/plain">plain text</option>
@@ -65,8 +72,9 @@
       </div>
 
       <div class="field">
-        <label for="blacklist">Blacklist
-        <span class="formHelp">Enter one fieldname per line that should be omitted from the export</span>
+        <label for="blacklist">
+          <span i18n:translate="">Blacklist</span>
+          <span class="formHelp" i18n:translate="">Enter one fieldname per line that should be omitted from the export</span>
         </label>
         <textarea
             cols="30"
@@ -75,8 +83,8 @@
             rows="5"></textarea>
       </div>
 
-      <button type="submit" class="context">Export</button>
-      <button type="reset">Reset</button>
+      <button type="submit" class="context" i18n:translate="">Export</button>
+      <button type="reset" i18n:translate="">Reset</button>
 
     </form>
 

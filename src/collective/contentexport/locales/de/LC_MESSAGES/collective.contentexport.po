@@ -1,6 +1,3 @@
-# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
-# SOME DESCRIPTIVE TITLE.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -15,7 +12,7 @@ msgstr ""
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: collective.contentexport\n"
+"Domain: DOMAIN\n"
 
 #: ../browser/templates/export_form.pt:63
 msgid "Base64-encoded string"
@@ -27,23 +24,23 @@ msgstr ""
 
 #: ../browser/templates/export_form.pt:33
 msgid "CSV File"
-msgstr ""
+msgstr "CSV Datei"
 
 #: ../browser/templates/export_form.pt:31
 msgid "Choose one"
-msgstr ""
+msgstr "Wählen Sie eine Option"
 
 #: ../browser/templates/export_form.pt:43
 msgid "Content Type to export"
-msgstr ""
+msgstr "Inhaltstyp der exportiert werden soll"
 
 #: ../browser/templates/export_form.pt:79
 msgid "Enter one fieldname per line that should be omitted from the export"
-msgstr ""
+msgstr "Geben Sie einen Feldname pro Zeile ein um dieses Feld zu ignorieren."
 
 #: ../browser/templates/export_form.pt:32
 msgid "Excel 2010 File"
-msgstr ""
+msgstr "Excel 2010 Datei"
 
 #: ../browser/templates/export_form.pt:14
 msgid "Export"
@@ -51,27 +48,27 @@ msgstr ""
 
 #: ../browser/templates/export_form.pt:23
 msgid "Export Type"
-msgstr ""
+msgstr "Art des Exports"
 
 #: ../browser/templates/export_form.pt:17
 msgid "Export content in various formats."
-msgstr ""
+msgstr "Exportiert Inhalte in diversen Formaten"
 
 #: ../browser/templates/export_form.pt:36
 msgid "Export files as zip"
-msgstr ""
+msgstr "Dateien als zip exportieren"
 
 #: ../browser/templates/export_form.pt:35
 msgid "Export images as zip"
-msgstr ""
+msgstr "Bilder als zip exportieren"
 
 #: ../browser/templates/export_form.pt:37
 msgid "Export related files and images as zip"
-msgstr ""
+msgstr "Verbundene Dateien und Bilder als zip exportieren"
 
 #: ../browser/templates/export_form.pt:60
 msgid "Image and File Format"
-msgstr ""
+msgstr "Format für Bilder und Dateien"
 
 #: ../browser/templates/export_form.pt:34
 msgid "JSON Dump"
@@ -79,11 +76,11 @@ msgstr ""
 
 #: ../browser/templates/export_form.pt:64
 msgid "Location within the a zip"
-msgstr ""
+msgstr "Relativer Pfad innerhald einer zip-Datei"
 
 #: ../browser/templates/export_form.pt:89
 msgid "Reset"
-msgstr ""
+msgstr "Zurücksetzen"
 
 #: ../browser/templates/export_form.pt:69
 msgid "Richtext Format"
