@@ -1,0 +1,5 @@
+====================
+collective.contentexport
+====================
+
+User documentation
