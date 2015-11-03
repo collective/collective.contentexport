@@ -17,4 +17,13 @@
       directory="static"
       />
 
+  <browser:page
+      for="*"
+      name="export_view"
+      permission="cmf.ManagePortal"
+      class=".export.ExportView"
+      template="templates/export_form.pt"
+      layer="..interfaces.ICollectiveContentexportLayer"
+      />
+
 </configure>

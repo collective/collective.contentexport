@@ -1,0 +1,86 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="kbo.webapp">
+<body>
+
+<metal:content-core fill-slot="main">
+
+    <form tal:attributes="action string:${context/absolute_url}/@@export_view">
+
+      <h1 class="">Export</h1>
+
+      <p i18n:translate="">
+        Export content in various formats.
+      </p>
+
+      <div class="field">
+        <label for="export_type">
+          Export Type
+          <span class="required horizontal" title="Erforderlich"> </span>
+        </label>
+        <select id="export_type" name="export_type">
+          <option selected="" value="" title="">Choose one</option>
+          <option value="xlsx" title="Excel 2010 File">Excel 2010 File</option>
+          <option title="CSV File" value="csv">CSV File</option>
+          <option title="JSON Dump" value="json">JSON Dump</option>
+          <option title="Images" value="images">Export images as zip</option>
+          <option title="Files" value="files">Export files as zip</option>
+          <option title="Relations" value="related">Export related files and images as zip</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="portal_type">
+          Content Type to export
+          <span class="required horizontal" title="Erforderlich"> </span>
+        </label>
+        <select id="portal_type" name="portal_type">
+          <option selected="" value="" title="">Choose one</option>
+          <option tal:repeat="ptype view/portal_types"
+                  tal:content="string:${ptype/title} (${ptype/number})"
+                  tal:attributes="value ptype/value; title ptype/title;">
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="blob_format">Image and File Format</label>
+        <select id="blob_format" name="blob_format">
+          <option selected="" value="url" title="url">URL</option>
+          <option title="base64" value="base64">Base64-encoded string</option>
+          <option title="zip_path" value="zip_path">Location within the a zip</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="richtext_format">Richtext Format</label>
+        <select id="richtext_format" name="richtext_format">
+          <option selected="" value="html" title="html">html</option>
+          <option title="text/plain" value="text/plain">plain text</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="blacklist">Blacklist
+        <span class="formHelp">Enter one fieldname per line that should be omitted from the export</span>
+        </label>
+        <textarea
+            cols="30"
+            id="blacklist"
+            name="blacklist"
+            rows="5"></textarea>
+      </div>
+
+      <button type="submit" class="context">Export</button>
+      <button type="reset">Reset</button>
+
+    </form>
+
+</metal:content-core>
+
+</body>
+</html>
