@@ -10,9 +10,32 @@ collective.contentexport
 Features
 --------
 
-- Provides a form ``/@@export_view`` to configure the export.
-- Exports dexterity content as xlsx, csv and json
-- Exports blobs from image, file and relation-fields as zip-files
+Exports dexterity content in various formats:
+
+ - xlsx
+ - xls
+ - csv
+ - tsv
+ - json
+ - yaml
+ - html (table)
+ - zip (for images and files and for related images and files)
+
+
+Usage
+-----
+
+Provides a form ``/@@export_view`` to configure the export.
+
+The form allows you to:
+
+- Select the export type
+- Select the content type to export
+- Choose fields from the selected type to be ignored
+- Select the format of richtext-fields (html/plaintext)
+- Select the format for files and images (url, base64, location within zip-file)
+
+collective.contentexport uses `tablib <https://pypi.python.org/pypi/tablib>`_ for several export-formats.
 
 
 Installation
