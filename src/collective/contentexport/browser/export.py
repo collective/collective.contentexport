@@ -403,7 +403,8 @@ class DXFields(BrowserView):
             return self.index()
         results = []
         for fieldname, field in get_schema_info(portal_type):
-            translated_title = translate(field.title)
+            translated_title = translate(
+                field.title, domain='plone', context=self.request)
             class_name = field.__class__.__name__
             results.append({
                 'id': fieldname,
