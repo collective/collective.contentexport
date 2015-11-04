@@ -21,8 +21,25 @@ from zope.schema.interfaces import IDatetime
 import base64
 import json
 import logging
+import pkg_resources
 import tablib
 import zipfile
+
+# Is there a multilingual addon?
+try:
+    pkg_resources.get_distribution('Products.LinguaPlone')
+except pkg_resources.DistributionNotFound:
+    HAS_MULTILINGUAL = False
+else:
+    HAS_MULTILINGUAL = True
+
+if not HAS_MULTILINGUAL:
+    try:
+        pkg_resources.get_distribution('plone.app.multilingual')
+    except pkg_resources.DistributionNotFound:
+        HAS_MULTILINGUAL = False
+    else:
+        HAS_MULTILINGUAL = True
 
 _marker = []
 log = logging.getLogger(__name__)
@@ -177,6 +194,10 @@ class ExportView(BrowserView):
 
         results = []
         catalog = api.portal.get_tool('portal_catalog')
+        query = {'portal_type': portal_type}
+        if HAS_MULTILINGUAL and 'Language' in catalog.indexes():
+            query['Language'] = 'all'
+
         brains = catalog(portal_type=portal_type)
         for brain in brains:
             obj = brain.getObject()
@@ -263,9 +284,11 @@ class ExportView(BrowserView):
         zip_file = zipfile.ZipFile(tmp_file, 'w')
 
         catalog = api.portal.get_tool('portal_catalog')
-        brains = catalog(portal_type=portal_type)
+        query = {'portal_type': portal_type}
         blobs_found = False
-        for brain in brains:
+        if HAS_MULTILINGUAL and 'Language' in catalog.indexes():
+            query['Language'] = 'all'
+        for brain in catalog(query):
             obj = brain.getObject()
             for fieldname, field in fields:
                 blobs = []
