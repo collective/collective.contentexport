@@ -26,4 +26,13 @@
       layer="..interfaces.ICollectiveContentexportLayer"
       />
 
+  <browser:page
+      name="dx_fields"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".export.DXFields"
+      layer="..interfaces.ICollectiveContentexportLayer"
+      template="templates/fieldnames.pt"
+      permission="cmf.ManagePortal"
+      />
+
 </configure>

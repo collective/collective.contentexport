@@ -10,6 +10,22 @@
 <metal:content-core fill-slot="main">
 
     <form tal:attributes="action string:${context/absolute_url}/@@export_view">
+      <script type="text/javascript">
+      function getDXFields(dx_typename) {
+          $.ajax({
+              url: '@@dx_fields',
+              dataType: 'html',
+              data: {'portal_type': dx_typename},
+              cache: false,
+              success: function(data) {
+                  var $div = $('#dx_fields');
+                  $div.empty();
+                  $div.html(data);
+              },
+              error: function(jqXHR, textStatus, errorThrown) {}
+          });
+      }
+      </script>
 
       <h1 class=""
           i18n:translate="">Export</h1>
@@ -49,7 +65,9 @@
               i18n:attributes="title title_required;"
               title="Required">&nbsp;</span>
         </label>
-        <select id="portal_type" name="portal_type">
+        <select id="portal_type"
+                name="portal_type"
+                tal:attributes="onChange string:javascript:getDXFields(dx_typename=this.value);">
           <option selected="" value="" title="" i18n:translate="">Choose one</option>
           <option tal:repeat="ptype view/portal_types"
                   tal:content="string:${ptype/title} (${ptype/number})"
@@ -57,6 +75,8 @@
           </option>
         </select>
       </div>
+
+      <div id="dx_fields"></div>
 
       <div class="field">
         <label for="blob_format" i18n:translate="">Image and File Format</label>
@@ -73,18 +93,6 @@
           <option selected="" value="html" title="html">html</option>
           <option title="text/plain" value="text/plain">plain text</option>
         </select>
-      </div>
-
-      <div class="field">
-        <label for="blacklist">
-          <span i18n:translate="">Blacklist</span>
-          <span class="formHelp" i18n:translate="">Enter one fieldname per line that should be omitted from the export</span>
-        </label>
-        <textarea
-            cols="30"
-            id="blacklist"
-            name="blacklist"
-            rows="5"></textarea>
       </div>
 
       <button type="submit" class="context" i18n:translate="">Export</button>

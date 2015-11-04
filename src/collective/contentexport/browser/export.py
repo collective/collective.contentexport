@@ -380,3 +380,23 @@ def pretty_join(iterable):
     if iterable:
         items = [unicode(i) for i in iterable if i]
         return ', '.join(items)
+
+
+class DXFields(BrowserView):
+
+    def __call__(self, portal_type=None):
+        '''Return schema fields (name and type) for the given DX typename.'''
+        if not portal_type:
+            self.fields = []
+            return self.index()
+        results = []
+        for fieldname, field in get_schema_info(portal_type):
+            translated_title = translate(field.title)
+            class_name = field.__class__.__name__
+            results.append({
+                'id': fieldname,
+                'title': '%s (%s)' % (translated_title, class_name),
+                'type': class_name
+            })
+        self.fields = results
+        return self.index()

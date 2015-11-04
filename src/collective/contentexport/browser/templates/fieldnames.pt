@@ -1,0 +1,19 @@
+<div class="field">
+<fieldset class="">
+<label for="blacklist2">
+  <span i18n:translate="">Blacklist</span>
+  <span class="formHelp" i18n:translate="">Check fields that should not be exported.</span>
+</label>
+<div class="checkbox" tal:repeat="field view/fields">
+  <label>
+    <input
+        type="checkbox"
+        value="fieldname"
+        name="blacklist"
+        id="fieldname"
+        tal:attributes="value field/id; id field/id">
+    <span tal:replace="field/title"/>
+  </label>
+</div>
+</fieldset>
+</div>
