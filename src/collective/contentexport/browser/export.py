@@ -206,7 +206,10 @@ class ExportView(BrowserView):
             for fieldname, field in all_fields:
                 value = field.get(field.interface(obj))
                 if not value:
-                    continue
+                    # set a value anyway to keep the dimensions of all
+                    value = ''
+                    # make sure we do no more transforms
+                    field = None
 
                 if IRichTextValue.providedBy(value):
                     value = transform_richtext(value, mimetype=richtext_format)
@@ -232,7 +235,8 @@ class ExportView(BrowserView):
                         value = base64.b64encode(value.data)
 
                 if IDatetime.providedBy(field) or IDate.providedBy(field):
-                    value = value().fCommon()
+                    value = api.portal.get_localized_time(
+                        value, long_format=True)
 
                 if safe_callable(value):
                     value = value()
@@ -371,7 +375,8 @@ def get_schema_info(portal_type, blacklist=None):
     fields = []
     for schema in iterSchemataForType(portal_type):
         for fieldname in schema:
-            fields.append((fieldname, schema.get(fieldname)))
+            if fieldname not in blacklist:
+                fields.append((fieldname, schema.get(fieldname)))
     return fields
 
 
