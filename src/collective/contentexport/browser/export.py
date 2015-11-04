@@ -301,6 +301,18 @@ class ExportView(BrowserView):
         return sorted(results, key=itemgetter('title'))
 
 
+def get_schema_info(portal_type, blacklist=None):
+    """Get a flat list of all fields in all schemas for a content-type.
+    """
+    if blacklist is None:
+        blacklist = []
+    fields = []
+    for schema in iterSchemataForType(portal_type):
+        for fieldname in schema:
+            fields.append((fieldname, schema.get(fieldname)))
+    return fields
+
+
 def get_url_for_relation(rel):
     """Get a useful URL from a relationitem.
     """
@@ -320,18 +332,6 @@ def get_url_for_relation(rel):
             brain.getURL())
     else:
         return brain.getURL()
-
-
-def get_schema_info(portal_type, blacklist=None):
-    """Get a flat list of all fields in all schemas for a content-type.
-    """
-    if blacklist is None:
-        blacklist = []
-    all_fields = [i.namesAndDescriptions() for i in
-                  iterSchemataForType(portal_type)]
-    # Flatten list of lists
-    all_fields = [i for x in all_fields for i in x if i[0] not in blacklist]
-    return all_fields
 
 
 def make_csv(all_fieldnames, data):
