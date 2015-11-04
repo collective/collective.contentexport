@@ -184,8 +184,8 @@ class ExportView(BrowserView):
 
             for fieldname, field in all_fields:
                 value = field.get(field.interface(obj))
-                    if not value:
-                        continue
+                if not value:
+                    continue
 
                 if IRichTextValue.providedBy(value):
                     value = transform_richtext(value, mimetype=richtext_format)
@@ -268,30 +268,42 @@ class ExportView(BrowserView):
         for brain in brains:
             obj = brain.getObject()
             for fieldname, field in fields:
-                blob = None
+                blobs = []
                 value = field.get(field.interface(obj))
                 if not value:
                     continue
 
-                if blob_type == 'related':
+                if blob_type != 'related':
+                    blobs = [value]
+                else:
                     if IRelationChoice.providedBy(field):
                         # manualy filter for fields
                         # if fieldname not in ['primary_picture']:
                         #     continue
-                        if value and not value.isBroken():
-                            rel_obj = value.to_object
+                        rel = value
+                        if rel and not rel.isBroken():
+                            rel_obj = rel.to_object
                             if rel_obj.portal_type == 'Image':
-                                blob = rel_obj.image
+                                blobs = [rel_obj.image]
                             elif rel_obj.portal_type == 'File':
-                                blob = rel_obj.file
-                else:
-                    blob = value
-                if blob:
+                                blobs = [rel_obj.file]
+
+                    if IRelationList.providedBy(field):
+                        for rel in value:
+                            if rel and not rel.isBroken():
+                                rel_obj = rel.to_object
+                                if rel_obj.portal_type == 'Image':
+                                    blobs.append(rel_obj.image)
+                                elif rel_obj.portal_type == 'File':
+                                    blobs.append(rel_obj.file)
+
+                for blob in blobs:
+                    filename = str((blob.filename).encode('utf8'))
                     zip_file.writestr(
                         '{0}_{1}/{2}'.format(
                             brain.UID,  # or: brain.id.upper(),
                             fieldname,
-                            str((blob.filename).encode("utf8"))),
+                            filename),
                         str(blob.data)
                     )
                     blobs_found = True
