@@ -322,9 +322,11 @@ def get_url_for_relation(rel):
         return brain.getURL()
 
 
-def get_schema_info(portal_type, blacklist):
+def get_schema_info(portal_type, blacklist=None):
     """Get a flat list of all fields in all schemas for a content-type.
     """
+    if blacklist is None:
+        blacklist = []
     all_fields = [i.namesAndDescriptions() for i in
                   iterSchemataForType(portal_type)]
     # Flatten list of lists
@@ -390,7 +392,7 @@ def transform_richtext(value, mimetype):
             orig=value.raw_encoded,
             encoding=value.encoding,
             mimetype=value.mimeType)
-        return value.getData()
+        return safe_unicode(value.getData())
 
 
 def pretty_join(iterable):
