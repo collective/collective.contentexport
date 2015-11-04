@@ -5,7 +5,14 @@ Changelog
 1.0a2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Localize datetime
+  [pbauer]
+
+- Prevent uneven dimension of data-dict
+  [pbauer]
+
+- Fox blacklist
+  [pbauer]
 
 
 1.0a1 (2015-11-04)
