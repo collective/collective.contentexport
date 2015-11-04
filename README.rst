@@ -12,14 +12,16 @@ Features
 
 Exports dexterity content in various formats:
 
- - xlsx
- - xls
- - csv
- - tsv
- - json
- - yaml
- - html (table)
- - zip (for images and files and for related images and files)
+- xlsx
+- xls
+- csv
+- tsv
+- json
+- yaml
+- html (a table)
+- zip-file containing all images from image-fields
+- zip-file containing all files from file-fields
+- zip-file containing related files and images from relationfields
 
 
 Usage
