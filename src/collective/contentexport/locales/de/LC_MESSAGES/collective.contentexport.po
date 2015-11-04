@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2015-11-03 15:38+0000\n"
+"POT-Creation-Date: 2015-11-04 15:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,79 +14,87 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
-#: ../browser/templates/export_form.pt:63
+#: ../browser/templates/export_form.pt:85
 msgid "Base64-encoded string"
 msgstr ""
 
-#: ../browser/templates/export_form.pt:78
-msgid "Blacklist"
-msgstr ""
-
-#: ../browser/templates/export_form.pt:33
-msgid "CSV File"
-msgstr "CSV Datei"
-
-#: ../browser/templates/export_form.pt:31
+#: ../browser/templates/export_form.pt:46
 msgid "Choose one"
 msgstr "Wählen Sie eine Option"
 
-#: ../browser/templates/export_form.pt:43
+#: ../browser/templates/export_form.pt:51
+msgid "Comma Separated Values File"
+msgstr "Komma getrennte CSV Datei"
+
+#: ../browser/templates/export_form.pt:62
 msgid "Content Type to export"
 msgstr "Inhaltstyp der exportiert werden soll"
 
-#: ../browser/templates/export_form.pt:79
-msgid "Enter one fieldname per line that should be omitted from the export"
-msgstr "Geben Sie einen Feldname pro Zeile ein um dieses Feld zu ignorieren."
+#: ../browser/templates/export_form.pt:48
+msgid "Excel Legacy Spreadsheet (xls)"
+msgstr "Alte Excel Datei (xls)"
 
-#: ../browser/templates/export_form.pt:32
-msgid "Excel 2010 File"
-msgstr "Excel 2010 Datei"
+#: ../browser/templates/export_form.pt:47
+msgid "Excel Spreadsheet (xlsx)"
+msgstr "Excel Datei (xlsx)"
 
-#: ../browser/templates/export_form.pt:14
+#: ../browser/templates/export_form.pt:30
 msgid "Export"
 msgstr ""
 
-#: ../browser/templates/export_form.pt:23
+#: ../browser/templates/export_form.pt:39
 msgid "Export Type"
 msgstr "Art des Exports"
 
-#: ../browser/templates/export_form.pt:17
+#: ../browser/templates/export_form.pt:33
 msgid "Export content in various formats."
 msgstr "Exportiert Inhalte in diversen Formaten"
 
-#: ../browser/templates/export_form.pt:36
+#: ../browser/templates/export_form.pt:55
 msgid "Export files as zip"
 msgstr "Dateien als zip exportieren"
 
-#: ../browser/templates/export_form.pt:35
+#: ../browser/templates/export_form.pt:54
 msgid "Export images as zip"
 msgstr "Bilder als zip exportieren"
 
-#: ../browser/templates/export_form.pt:37
+#: ../browser/templates/export_form.pt:56
 msgid "Export related files and images as zip"
 msgstr "Verbundene Dateien und Bilder als zip exportieren"
 
-#: ../browser/templates/export_form.pt:60
+#: ../browser/templates/export_form.pt:50
+msgid "HTML Table"
+msgstr "HTML Tabelle"
+
+#: ../browser/templates/export_form.pt:82
 msgid "Image and File Format"
 msgstr "Format für Bilder und Dateien"
 
-#: ../browser/templates/export_form.pt:34
+#: ../browser/templates/export_form.pt:53
 msgid "JSON Dump"
 msgstr ""
 
-#: ../browser/templates/export_form.pt:64
+#: ../browser/templates/export_form.pt:86
 msgid "Location within the a zip"
 msgstr "Relativer Pfad innerhald einer zip-Datei"
 
-#: ../browser/templates/export_form.pt:89
+#: ../browser/templates/export_form.pt:99
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: ../browser/templates/export_form.pt:69
+#: ../browser/templates/export_form.pt:91
 msgid "Richtext Format"
+msgstr "Format des Inhalts von Richtext-Feldern"
+
+#: ../browser/templates/export_form.pt:52
+msgid "Tab Separated Values File"
+msgstr "Tab getrennte TSV-Datei"
+
+#: ../browser/templates/export_form.pt:84
+msgid "URL"
 msgstr ""
 
-#: ../browser/templates/export_form.pt:62
-msgid "URL"
+#: ../browser/templates/export_form.pt:49
+msgid "YAML"
 msgstr ""
 

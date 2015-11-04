@@ -39,6 +39,11 @@ The form allows you to:
 
 collective.contentexport uses `tablib <https://pypi.python.org/pypi/tablib>`_ for several export-formats.
 
+Compatability
+-------------
+
+collective.contentexport is tested to work in Plone 4 and Plone 5.
+
 
 Installation
 ------------
