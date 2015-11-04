@@ -160,10 +160,7 @@ class ExportView(BrowserView):
             item_dict = dict()
 
             for fieldname, field in all_fields:
-                if getattr(obj, fieldname, _marker) is _marker:
-                    continue
-                else:
-                    value = getattr(obj, fieldname)
+                value = field.get(field.interface(obj))
                     if not value:
                         continue
 
