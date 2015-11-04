@@ -252,14 +252,20 @@ class ExportView(BrowserView):
 
             # add some additional defaults
             # TODO: make that configurable
-            all_fieldnames.append('id')
-            item_dict['id'] = brain.id
+            fieldname = 'id'
+            if fieldname in all_fieldnames and fieldname not in blacklist:
+                all_fieldnames.append(fieldname)
+                item_dict[fieldname] = brain.id
 
-            all_fieldnames.append('url')
-            item_dict['url'] = brain.getURL()
+            fieldname = 'url'
+            if fieldname in all_fieldnames and fieldname not in blacklist:
+                all_fieldnames.append(fieldname)
+            item_dict[fieldname] = brain.getURL()
 
-            all_fieldnames.append('uid')
-            item_dict['uid'] = brain.UID
+            fieldname = 'uid'
+            if fieldname in all_fieldnames and fieldname not in blacklist:
+                all_fieldnames.append(fieldname)
+                item_dict[fieldname] = brain.UID
 
             results.append(item_dict)
         return (all_fieldnames, results)

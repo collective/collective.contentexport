@@ -5,7 +5,8 @@ Changelog
 1.0a3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add tests
+  [pbauer]
 
 
 1.0a2 (2015-11-04)
@@ -17,7 +18,7 @@ Changelog
 - Prevent uneven dimension of data-dict
   [pbauer]
 
-- Fox blacklist
+- Fix blacklist
   [pbauer]
 
 
