@@ -46,8 +46,7 @@ setup(
         'plone.api',
         'setuptools',
         'z3c.jbot',
-        'unicodecsv',
-        'openpyxl',
+        'tablib',
     ],
     extras_require={
         'test': [

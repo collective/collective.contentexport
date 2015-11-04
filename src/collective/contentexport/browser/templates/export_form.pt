@@ -28,12 +28,16 @@
         </label>
         <select id="export_type" name="export_type">
           <option selected="" value="" title="" i18n:translate="">Choose one</option>
-          <option value="xlsx" title="Excel 2010 File" i18n:translate="">Excel 2010 File</option>
-          <option title="CSV File" value="csv" i18n:translate="">CSV File</option>
+          <option value="xlsx" title="Excel File" i18n:translate="">Excel Spreadsheet (xlsx)</option>
+          <option value="xls" title="Excel File (old)" i18n:translate="">Excel Legacy Spreadsheet (xls)</option>
+          <option value="yaml" title="yaml" i18n:translate="">YAML</option>
+          <option value="html" title="html" i18n:translate="">HTML Table</option>
+          <option title="CSV File" value="csv" i18n:translate="">Comma Separated Values File</option>
+          <option title="Tab Separated Values" value="tsv" i18n:translate="">Tab Separated Values File</option>
           <option title="JSON Dump" value="json" i18n:translate="">JSON Dump</option>
           <option title="Images" value="images" i18n:translate="">Export images as zip</option>
           <option title="Files" value="files" i18n:translate="">Export files as zip</option>
-          <option title="Relations" value="related" i18n:translate="">Export related files and images as zip</option>
+          <option title="Related files and images" value="related" i18n:translate="">Export related files and images as zip</option>
         </select>
       </div>
 

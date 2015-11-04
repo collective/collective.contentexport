@@ -3,8 +3,6 @@ from Products.CMFPlone.utils import safe_callable
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from StringIO import StringIO
-from openpyxl import Workbook
 from operator import itemgetter
 from plone import api
 from plone.app.textfield.interfaces import IRichTextValue
@@ -23,7 +21,7 @@ from zope.schema.interfaces import IDatetime
 import base64
 import json
 import logging
-import unicodecsv
+import tablib
 import zipfile
 
 _marker = []
@@ -35,9 +33,12 @@ class ExportView(BrowserView):
 
     :param export_type: [required] The type of export
         Supported options:
-        - 'xlsx': Excel 2010 Format
+        - 'xlsx': Excel Format
+        - 'xls': Old Excel Format
         - 'csv': csv File
+        - 'yaml': yaml File
         - 'json': json dump
+        - 'html': html table
         - 'images': Export only images from image-fields as zip
         - 'files': Export only files from file-fields as zip
         - 'related': Export only related files and images as zip
@@ -111,31 +112,53 @@ class ExportView(BrowserView):
 
         all_fieldnames = list(set(additional + all_fieldnames))
 
+        dataset = tablib.Dataset()
+        dataset.dict = data
+
         if export_type == 'xlsx':
-            result = make_xslx(all_fieldnames, data)
-            filename = "%s_export.xlsx" % portal_type
-            with NamedTemporaryFile() as tmpfile:
-                result.save(tmpfile.name)
-                tmpfile.seek(0)
-                self.request.response.setHeader('Content-Type', 'text/xlsx')
-                self.request.response.setHeader(
-                    'Content-Disposition',
-                    'attachment; filename="%s"' % filename)
-                return file(tmpfile.name).read()
+            result = dataset.xlsx
+            return self.export_file(
+                result,
+                portal_type,
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # noqa
+                'xlsx')
+
+        if export_type == 'xls':
+            result = dataset.xls
+            return self.export_file(
+                result, portal_type, 'application/vnd.ms-excel', 'xls')
 
         if export_type == 'csv':
-            result = make_csv(all_fieldnames, data)
-            filename = "%s_export.csv" % portal_type
-            self.request.response.setHeader('Content-Type', 'text/csv')
-            self.request.response.setHeader(
-                'Content-Disposition',
-                'attachment; filename="%s"' % filename)
-            return result.getvalue()
+            result = dataset.csv
+            return self.export_file(result, portal_type, 'text/csv', 'csv')
+
+        if export_type == 'tsv':
+            return dataset.tsv
+            return self.export_file(
+                result, portal_type, 'text/tab-separated-values', 'tsv')
+
+        if export_type == 'yaml':
+            result = dataset.yaml
+            return self.export_file(result, portal_type, 'text/yaml', 'yaml')
+
+        if export_type == 'html':
+            return dataset.html
 
         if export_type == 'json':
             pretty = json.dumps(data, sort_keys=True, indent=4)
             self.request.response.setHeader('Content-type', 'application/json')
             return pretty
+
+    def export_file(self, result, portal_type, mimetype, extension):
+        filename = "{0}_export.{1}".format(portal_type, extension)
+        with NamedTemporaryFile(mode='wb') as tmpfile:
+            tmpfile.write(result)
+            tmpfile.seek(0)
+            self.request.response.setHeader('Content-Type', mimetype)
+            self.request.response.setHeader(
+                'Content-Disposition',
+                'attachment; filename="%s"' % filename)
+            return file(tmpfile.name).read()
 
     def get_export_data(
         self,
@@ -201,9 +224,16 @@ class ExportView(BrowserView):
                         value = value
 
                 item_dict[fieldname] = value
+
             # add some additional defaults
+            # TODO: make that configurable
+            all_fieldnames.append('id')
             item_dict['id'] = brain.id
+
+            all_fieldnames.append('url')
             item_dict['url'] = brain.getURL()
+
+            all_fieldnames.append('uid')
             item_dict['uid'] = brain.UID
 
             results.append(item_dict)
@@ -329,52 +359,6 @@ def get_url_for_relation(rel):
             brain.getURL())
     else:
         return brain.getURL()
-
-
-def make_csv(all_fieldnames, data):
-    """Transform a list of strings (header) and a dict to a csv.
-    """
-    result = StringIO()
-    writer = unicodecsv.DictWriter(
-        result,
-        fieldnames=sorted(all_fieldnames),
-        delimiter=';',
-        quoting=unicodecsv.QUOTE_MINIMAL
-    )
-    writer.writeheader()
-    for data_dict in data:
-        writer.writerow(data_dict)
-    return result
-
-
-def excel_style(col):
-    """ Convert number to excel-style cell name.
-    """
-    LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    result = []
-    while col:
-        col, rem = divmod(col-1, 26)
-        result[:0] = LETTERS[rem]
-    return ''.join(result)
-
-
-def make_xslx(all_fieldnames, data):
-    """Transform a list of strings (header) and a dict to a xlsx-workbook.
-    """
-    columnname_mapping = dict()
-    for index, name in enumerate(all_fieldnames, start=1):
-        col = excel_style(index)
-        columnname_mapping[name] = col
-
-    wb = Workbook(guess_types=True)
-    ws = wb.active
-    ws.title = "Export"
-    ws.append(all_fieldnames)
-    for row, data_dict in enumerate(data, start=2):
-        for k, v in data_dict.items():
-            cellname = '%s%s' % (columnname_mapping[k], row)
-            ws[cellname] = v
-    return wb
 
 
 def transform_richtext(value, mimetype):
