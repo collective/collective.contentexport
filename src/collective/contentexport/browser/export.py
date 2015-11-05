@@ -244,7 +244,7 @@ class ExportView(BrowserView):
                     value = get_url_for_relation(value)
 
                 if INamed.providedBy(value):
-                    value = get_blob_url(brain, blob_format, fieldname)
+                    value = get_blob_url(value, brain, blob_format, fieldname)
 
                 if IDatetime.providedBy(field) or IDate.providedBy(field):
                     value = api.portal.get_localized_time(
@@ -425,13 +425,13 @@ def get_url_for_relation(rel):
         return brain.getURL()
 
 
-def get_blob_url(brain, blob_format, fieldname):
+def get_blob_url(value, brain, blob_format, fieldname):
     if blob_format == 'url':
         value = '{0}/@@download/{1}'.format(
             brain.getURL(), fieldname)
     if blob_format == 'zip_path':
-        value = '{0}/{1}'.format(
-            brain.UID, str((value.filename).encode("utf8")))
+        filename = safe_unicode(value.filename).split('/')[-1]
+        value = '{0}/{1}'.format(brain.UID, filename)
     if blob_format == 'base64':
         value = base64.b64encode(value.data)
     return value

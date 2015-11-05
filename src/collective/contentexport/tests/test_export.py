@@ -97,6 +97,36 @@ class TestExport(unittest.TestCase):
             results = view(export_type=export_format, portal_type='Document')
             self.assertTrue(results)
 
+    def test_blob_formats(self):
+        image = api.content.create(
+            self.portal,
+            'Image',
+            'image1',
+            u'❤︎ly Pløne Image')
+        image.description = "This is my image."
+        image.image = dummy_image()
+        view = api.content.get_view('export_view', self.portal, self.request)
+
+        results = view(
+            export_type='json', portal_type='Image', blob_format='url')
+        results = json.loads(results)
+        self.assertEquals(len(results), 1)
+        self.assertEquals(
+            u'http://nohost/plone/image1/@@download/image',
+            results[0]['image'])
+
+        results = view(
+            export_type='json', portal_type='Image', blob_format='zip_path')
+        results = json.loads(results)
+        self.assertEquals(
+            u'{0}/image.png'.format(api.content.get_uuid(image)),
+            results[0]['image'])
+
+        results = view(
+            export_type='json', portal_type='Image', blob_format='base64')
+        results = json.loads(results)
+        self.assertEquals(1580, len(results[0]['image']))
+
     def test_blacklist(self):
         view = api.content.get_view('export_view', self.portal, self.request)
         result = view('json', 'Document', blacklist=[])
@@ -175,3 +205,21 @@ class TestExport(unittest.TestCase):
             'attachment; filename="related.zip"')
         size = int(view.request.response.headers['content-length'])
         self.assertTrue(3050 < size < 3150)
+
+        view = api.content.get_view('export_view', self.portal, self.request)
+        results = view(export_type='json', portal_type='Document')
+        results = json.loads(results)
+        related = results[0]['relatedItems']
+        self.assertEquals(len(related.split(',')), 3)
+        self.assertIn('http://nohost/plone/image1/@@download/image', related)
+        self.assertIn('http://nohost/plone/file1/@@download/file', related)
+        # TODO: Fix this
+        self.assertIn(
+            'http://nohost/plone/file-without-blob/@@download/file', related)
+
+    def test_dx_fields(self):
+        view = api.content.get_view('dx_fields', self.portal, self.request)
+        results = view(portal_type='Document')
+        self.assertIn(
+            '<input type="checkbox" value="relatedItems" name="blacklist" id="relatedItems">',  # noqa
+            results)
