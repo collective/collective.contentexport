@@ -5,8 +5,9 @@
 .. image:: https://travis-ci.org/starzel/collective.contentexport.svg?branch=master
     :target: https://travis-ci.org/starzel/collective.contentexport
 
- .. image:: https://coveralls.io/repos/starzel/collective.contentexport/badge.svg?branch=master&service=github
+.. image:: https://coveralls.io/repos/starzel/collective.contentexport/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/starzel/collective.contentexport?branch=master
+
 
 ==============================================================================
 collective.contentexport
