@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Setup tests for this package."""
+"""Export tests for this package."""
 from collective.contentexport.testing import COLLECTIVE_CONTENTEXPORT_INTEGRATION_TESTING  # noqa
+from persistent.list import PersistentList
 from plone import api
 from plone.app.textfield.value import RichTextValue
-
+from z3c.relationfield import RelationValue
+from zope.component import getUtility
+from zope.intid.interfaces import IIntIds
+from zope.lifecycleevent import modified
 import os
 import json
 import unittest
@@ -86,7 +90,7 @@ class TestExport(unittest.TestCase):
         self.assertEqual(
             len(json.loads(result)[0]), length - 3)
 
-    def test_image_exports(self):
+    def test_images_export(self):
         image = api.content.create(
             self.portal,
             'Image',
@@ -99,5 +103,57 @@ class TestExport(unittest.TestCase):
         self.assertEqual(
             view.request.response.headers['content-disposition'],
             'attachment; filename="images.zip"')
-        self.assertTrue(
-            int(view.request.response.headers['content-length']) > 1500)
+        size = int(view.request.response.headers['content-length'])
+        self.assertTrue(1500 < size < 1600)
+
+    def test_files_export(self):
+        file1 = api.content.create(
+            self.portal,
+            'File',
+            'file1',
+            u'❤︎ly Pløne File')
+        file1.description = "This is my file."
+        file1.file = dummy_image()
+        view = api.content.get_view('export_view', self.portal, self.request)
+        view(export_type='files', portal_type='File')
+        self.assertEqual(
+            view.request.response.headers['content-disposition'],
+            'attachment; filename="files.zip"')
+        size = int(view.request.response.headers['content-length'])
+        self.assertTrue(1500 < size < 1600)
+
+    def test_relations_export(self):
+        image = api.content.create(
+            self.portal,
+            'Image',
+            'image1',
+            u'❤︎ly Pløne Image')
+        image.description = "This is my image."
+        image.image = dummy_image()
+        file1 = api.content.create(
+            self.portal,
+            'File',
+            'file1',
+            u'❤︎ly Pløne File')
+        file1.description = "This is my file."
+        file1.file = dummy_image()
+        file_without_blob = api.content.create(
+            self.portal,
+            'File',
+            'file-without-blob',
+            u'Pløne File without a blob')
+        # Add relations
+        doc = self.portal['doc1']
+        intids = getUtility(IIntIds)
+        doc.relatedItems = PersistentList()
+        doc.relatedItems.append(RelationValue(intids.getId(image)))
+        doc.relatedItems.append(RelationValue(intids.getId(file1)))
+        doc.relatedItems.append(RelationValue(intids.getId(file_without_blob)))
+        modified(doc)
+        view = api.content.get_view('export_view', self.portal, self.request)
+        view(export_type='related', portal_type='Document')
+        self.assertEqual(
+            view.request.response.headers['content-disposition'],
+            'attachment; filename="related.zip"')
+        size = int(view.request.response.headers['content-length'])
+        self.assertTrue(3050 < size < 3150)

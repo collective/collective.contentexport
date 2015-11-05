@@ -19,6 +19,7 @@ from zope.i18n import translate
 from zope.schema.interfaces import IDate
 from zope.schema.interfaces import IDatetime
 import base64
+import collections
 import json
 import logging
 import pkg_resources
@@ -43,6 +44,28 @@ if not HAS_MULTILINGUAL:
 
 _marker = []
 log = logging.getLogger(__name__)
+
+
+# helper methods to get additional data from objects
+def _url(obj):
+    return obj.absolute_url()
+
+
+def _id(obj):
+    return obj.id
+
+
+def _uid(obj):
+    return api.content.get_uuid(obj)
+
+# This is a dict of headername and method to get additional useful date
+# from the objects. This can also be used to override the getters fields with
+# the same name to use custom methods to get data.
+ADDITIONAL_MAPPING = {
+    'id': _id,
+    'url': _url,
+    'uid': _uid,
+}
 
 
 class ExportView(BrowserView):
@@ -111,23 +134,18 @@ class ExportView(BrowserView):
         if not blacklist:
             blacklist = []
 
-        if not additional:
-            additional = []
+        if additional:
+            ADDITIONAL_MAPPING.update(additional)
 
         if export_type in ['images', 'files', 'related']:
             return self.export_blobs(
                 portal_type, blob_type=export_type, blacklist=blacklist)
 
-        all_fieldnames, data = self.get_export_data(
+        data = self.get_export_data(
             portal_type,
             blob_format,
             richtext_format,
             blacklist)
-
-        default_additional = ['id', 'url', 'uid']
-        additional.extend(default_additional)
-
-        all_fieldnames = list(set(additional + all_fieldnames))
 
         dataset = tablib.Dataset()
         dataset.dict = data
@@ -184,13 +202,11 @@ class ExportView(BrowserView):
         richtext_format,
         blacklist
     ):
-        """Return a tuple with:
-        1. a list with the names of all values that are exported
-        2. a list of dicts with a dict for each object. The key being the name
-          of the value and the value the value.
+        """Return a list of dicts with a dict for each object.
+
+        The key is the name of the field/value and the value the value.
         """
         all_fields = get_schema_info(portal_type, blacklist)
-        all_fieldnames = [i[0] for i in all_fields]
 
         results = []
         catalog = api.portal.get_tool('portal_catalog')
@@ -198,12 +214,17 @@ class ExportView(BrowserView):
         if HAS_MULTILINGUAL and 'Language' in catalog.indexes():
             query['Language'] = 'all'
 
-        brains = catalog(portal_type=portal_type)
+        brains = catalog(query)
         for brain in brains:
             obj = brain.getObject()
             item_dict = dict()
 
             for fieldname, field in all_fields:
+                if fieldname in ADDITIONAL_MAPPING:
+                    # The way to access the value from this fields is
+                    # overridden in ADDITIONAL_MAPPING
+                    continue
+
                 value = field.get(field.interface(obj))
                 if not value:
                     # set a value anyway to keep the dimensions of all
@@ -224,15 +245,7 @@ class ExportView(BrowserView):
                     value = get_url_for_relation(value)
 
                 if INamed.providedBy(value):
-                    if blob_format == 'url':
-                        value = '{0}/@@download/{1}'.format(
-                            obj.absolute_url(), fieldname)
-                    if blob_format == 'zip_path':
-                        value = '{0}/{1}'.format(
-                            api.content.get_uuid(obj),
-                            str((value.filename).encode("utf8")))
-                    if blob_format == 'base64':
-                        value = base64.b64encode(value.data)
+                    value = get_blob_url(brain, blob_format, fieldname)
 
                 if IDatetime.providedBy(field) or IDate.providedBy(field):
                     value = api.portal.get_localized_time(
@@ -241,34 +254,16 @@ class ExportView(BrowserView):
                 if safe_callable(value):
                     value = value()
 
-                if isinstance(value, list) or isinstance(value, tuple):
-                    try:
-                        value = pretty_join(value)
-                    except:
-                        # try using the original value
-                        value = value
+                if isinstance(value, collections.Iterable):
+                    value = pretty_join(value)
 
                 item_dict[fieldname] = value
 
-            # add some additional defaults
-            # TODO: make that configurable
-            fieldname = 'id'
-            if fieldname in all_fieldnames and fieldname not in blacklist:
-                all_fieldnames.append(fieldname)
-                item_dict[fieldname] = brain.id
-
-            fieldname = 'url'
-            if fieldname in all_fieldnames and fieldname not in blacklist:
-                all_fieldnames.append(fieldname)
-            item_dict[fieldname] = brain.getURL()
-
-            fieldname = 'uid'
-            if fieldname in all_fieldnames and fieldname not in blacklist:
-                all_fieldnames.append(fieldname)
-                item_dict[fieldname] = brain.UID
+            # Update the data with additional info or overridden getters
+            item_dict.update(additional_data(obj, blacklist))
 
             results.append(item_dict)
-        return (all_fieldnames, results)
+        return results
 
     def export_blobs(self, portal_type, blob_type, blacklist):
         """Return a zip-file with file and/or images  for the required export.
@@ -301,6 +296,9 @@ class ExportView(BrowserView):
         for brain in catalog(query):
             obj = brain.getObject()
             for fieldname, field in fields:
+                # manualy filter for fields
+                # if fieldname not in ['primary_picture']:
+                #     continue
                 blobs = []
                 value = field.get(field.interface(obj))
                 if not value:
@@ -308,29 +306,13 @@ class ExportView(BrowserView):
 
                 if blob_type != 'related':
                     blobs = [value]
-                else:
-                    if IRelationChoice.providedBy(field):
-                        # manualy filter for fields
-                        # if fieldname not in ['primary_picture']:
-                        #     continue
-                        rel = value
-                        if rel and not rel.isBroken():
-                            rel_obj = rel.to_object
-                            if rel_obj.portal_type == 'Image':
-                                blobs = [rel_obj.image]
-                            elif rel_obj.portal_type == 'File':
-                                blobs = [rel_obj.file]
-
-                    if IRelationList.providedBy(field):
-                        for rel in value:
-                            if rel and not rel.isBroken():
-                                rel_obj = rel.to_object
-                                if rel_obj.portal_type == 'Image':
-                                    blobs.append(rel_obj.image)
-                                elif rel_obj.portal_type == 'File':
-                                    blobs.append(rel_obj.file)
+                elif IRelationChoice.providedBy(field) or \
+                        IRelationList.providedBy(field):
+                    blobs = get_blobs_from_relations(value, field)
 
                 for blob in blobs:
+                    if not blob:
+                        continue
                     filename = str((blob.filename).encode('utf8'))
                     zip_file.writestr(
                         '{0}_{1}/{2}'.format(
@@ -373,6 +355,43 @@ class ExportView(BrowserView):
         return sorted(results, key=itemgetter('title'))
 
 
+def get_blobs_from_relations(value, field):
+    """Extract the blobs from relationfields.
+    """
+    blobs = []
+    if IRelationChoice.providedBy(field):
+        rel = value
+        if rel and not rel.isBroken():
+            rel_obj = rel.to_object
+            if rel_obj.portal_type == 'Image':
+                blobs = [rel_obj.image]
+            elif rel_obj.portal_type == 'File':
+                blobs = [rel_obj.file]
+
+    if IRelationList.providedBy(field):
+        for rel in value:
+            if rel and not rel.isBroken():
+                rel_obj = rel.to_object
+                if rel_obj.portal_type == 'Image':
+                    blobs.append(rel_obj.image)
+                elif rel_obj.portal_type == 'File':
+                    blobs.append(rel_obj.file)
+    return blobs
+
+
+def additional_data(obj, blacklist):
+    """Create a dict with fieldname: data from ADDITIONAL_MAPPING.
+
+    By default this makes sure the url, uid and id of the objects is
+    created.
+    """
+    item_dict = {}
+    for headername in ADDITIONAL_MAPPING:
+        if headername not in blacklist:
+            item_dict[headername] = ADDITIONAL_MAPPING[headername](obj)
+    return item_dict
+
+
 def get_schema_info(portal_type, blacklist=None):
     """Get a flat list of all fields in all schemas for a content-type.
     """
@@ -407,6 +426,18 @@ def get_url_for_relation(rel):
         return brain.getURL()
 
 
+def get_blob_url(brain, blob_format, fieldname):
+    if blob_format == 'url':
+        value = '{0}/@@download/{1}'.format(
+            brain.getURL(), fieldname)
+    if blob_format == 'zip_path':
+        value = '{0}/{1}'.format(
+            brain.UID, str((value.filename).encode("utf8")))
+    if blob_format == 'base64':
+        value = base64.b64encode(value.data)
+    return value
+
+
 def transform_richtext(value, mimetype):
     """Transform RichtextValue object to a useable output-format.
     """
@@ -423,9 +454,12 @@ def transform_richtext(value, mimetype):
 
 
 def pretty_join(iterable):
-    if iterable:
-        items = [unicode(i) for i in iterable if i]
-        return ', '.join(items)
+    try:
+        return ', '.join([safe_unicode(i) for i in iterable if i])
+    except TypeError:
+        # some items (like the query-string dicts in collections) can not be
+        # turned into strings
+        return iterable
 
 
 class DXFields(BrowserView):
@@ -445,5 +479,5 @@ class DXFields(BrowserView):
                 'title': '%s (%s)' % (translated_title, class_name),
                 'type': class_name
             })
-        self.fields = results
+        self.fields = sorted(results, key=itemgetter('title'))
         return self.index()

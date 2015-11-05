@@ -45,6 +45,8 @@ class TestUninstall(unittest.TestCase):
 
     def test_browserlayer_removed(self):
         """Test that ICollectiveContentexportLayer is removed."""
-        from collective.contentexport.interfaces import ICollectiveContentexportLayer
+        from collective.contentexport.interfaces import (
+            ICollectiveContentexportLayer)
         from plone.browserlayer import utils
-        self.assertNotIn(ICollectiveContentexportLayer, utils.registered_layers())
+        self.assertNotIn(
+            ICollectiveContentexportLayer, utils.registered_layers())

@@ -5,6 +5,13 @@ Changelog
 1.0a3 (unreleased)
 ------------------
 
+- Sort fieldnames in blacklist by alphabet.
+  [pbauer]
+
+- Add ability to provide additional export-methods for arbitrary data by
+  extending ADDITIONAL_MAPPING.
+  [pbauer]
+
 - Add tests
   [pbauer]
 
