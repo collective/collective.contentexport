@@ -19,7 +19,6 @@ from zope.i18n import translate
 from zope.schema.interfaces import IDate
 from zope.schema.interfaces import IDatetime
 import base64
-import collections
 import json
 import logging
 import pkg_resources
@@ -254,7 +253,7 @@ class ExportView(BrowserView):
                 if safe_callable(value):
                     value = value()
 
-                if isinstance(value, collections.Iterable):
+                if isinstance(value, list) or isinstance(value, tuple):
                     value = pretty_join(value)
 
                 item_dict[fieldname] = value

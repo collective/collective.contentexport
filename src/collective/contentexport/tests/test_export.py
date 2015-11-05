@@ -74,6 +74,24 @@ class TestExport(unittest.TestCase):
             u"Lorem ❤︎ ipsum",
             'text/plain',
             'text/html')
+        doc2.subject = (u'❤', u'Plone')
+        doc2.description = u'Ich mag Sönderzeichen'
+        view = api.content.get_view('export_view', self.portal, self.request)
+        results = view(export_type='json', portal_type='Document')
+        results = json.loads(results)
+        self.assertEquals(u'❤, Plone', results[1]['subjects'])
+        self.assertEquals(doc2.description, results[1]['description'])
+
+    def test_all_export_formats(self):
+        doc2 = api.content.create(
+            self.portal,
+            'Document',
+            'doc2',
+            u'I also ❤︎ the Pløne')
+        doc2.text = RichTextValue(
+            u"Lorem ❤︎ ipsum",
+            'text/plain',
+            'text/html')
         view = api.content.get_view('export_view', self.portal, self.request)
         for export_format in formats:
             results = view(export_type=export_format, portal_type='Document')
