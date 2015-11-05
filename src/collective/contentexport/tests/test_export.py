@@ -51,8 +51,8 @@ class TestExport(unittest.TestCase):
             u'I ❤︎ the Pløne')
         document.description = u'This is a ❤︎ document.'
         document.text = RichTextValue(
-            u"Lorem ❤︎ ipsum",
-            'text/plain',
+            u'<p>Lorem ❤︎ ipsum</p>',
+            'text/html',
             'text/html')
 
     def test_export_form_renders(self):
@@ -71,15 +71,19 @@ class TestExport(unittest.TestCase):
             'doc2',
             u'I also ❤︎ the Pløne')
         doc2.text = RichTextValue(
-            u"Lorem ❤︎ ipsum",
-            'text/plain',
+            u'<h2>Lorem ❤︎ ipsum</h2>',
+            'text/html',
             'text/html')
         doc2.subject = (u'❤', u'Plone')
         doc2.description = u'Ich mag Sönderzeichen'
         view = api.content.get_view('export_view', self.portal, self.request)
-        results = view(export_type='json', portal_type='Document')
+        results = view(
+            export_type='json',
+            portal_type='Document',
+            richtext_format='text/plain')
         results = json.loads(results)
         self.assertEquals(u'❤, Plone', results[1]['subjects'])
+        self.assertEquals(u' Lorem ❤︎ ipsum ', results[1]['text'])
         self.assertEquals(doc2.description, results[1]['description'])
 
     def test_all_export_formats(self):
@@ -216,6 +220,30 @@ class TestExport(unittest.TestCase):
         # TODO: Fix this
         self.assertIn(
             'http://nohost/plone/file-without-blob/@@download/file', related)
+
+    def test_iterables_fallback_format(self):
+        query = [{
+            'i': 'Title',
+            'o': 'plone.app.querystring.operation.string.contains',
+            'v': u'I ❤︎ the Pløne',
+        }]
+        coll = api.content.create(
+            self.portal,
+            'Collection',
+            'coll1',
+            u'❤︎ly Collection',
+            query=query)
+        self.assertEquals(
+            [i for i in coll.results()][0].getObject(),
+            self.portal['doc1'])
+        view = api.content.get_view('export_view', self.portal, self.request)
+        results = view(export_type='json', portal_type='Collection')
+        results = json.loads(results)
+        self.assertEquals(
+            results[0]['query'],
+            [{u'i': u'Title',
+              u'o': u'plone.app.querystring.operation.string.contains',
+              u'v': u'I \u2764\ufe0e the Pl\xf8ne'}])
 
     def test_dx_fields(self):
         view = api.content.get_view('dx_fields', self.portal, self.request)
