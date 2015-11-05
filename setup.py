@@ -19,7 +19,7 @@ long_description = (
 
 setup(
     name='collective.contentexport',
-    version='1.0a3.dev0',
+    version='1.0b1',
     description="Plone add-on to export dexterity content in various formats",
     long_description=long_description,
     # Get more from https://pypi.python.org/pypi?%3Aaction=list_classifiers
