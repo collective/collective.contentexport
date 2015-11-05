@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0a3 (unreleased)
+1.0a4 (2015-11-05)
 ------------------
 
 - Sort fieldnames in blacklist by alphabet.
