@@ -28,10 +28,10 @@ formats = [
 
 def dummy_image():
     from plone.namedfile.file import NamedBlobImage
-    filename = os.path.join(os.path.dirname(__file__), u'image.png')
+    image_file = os.path.join(os.path.dirname(__file__), u'image.png')
     return NamedBlobImage(
-        data=open(filename, 'r').read(),
-        filename=filename
+        data=open(image_file, 'r').read(),
+        filename=u'image.png'
     )
 
 
@@ -142,6 +142,17 @@ class TestExport(unittest.TestCase):
         self.assertEqual(
             len(json.loads(result)[0]), length - 3)
 
+    def test_whitelist(self):
+        view = api.content.get_view('export_view', self.portal, self.request)
+        result = view('json', 'Document', whitelist=['id'])
+        self.assertEqual(len(json.loads(result)[0]), 1)
+
+        result = view('json', 'Document', whitelist=['description', 'title'])
+        self.assertEqual(len(json.loads(result)[0]), 2)
+
+        result = view('images', 'Document', whitelist=['description', 'title'])
+        self.assertEquals('No images found', result)
+
     def test_images_export(self):
         image = api.content.create(
             self.portal,
@@ -156,7 +167,19 @@ class TestExport(unittest.TestCase):
             view.request.response.headers['content-disposition'],
             'attachment; filename="images.zip"')
         size = int(view.request.response.headers['content-length'])
-        self.assertTrue(1500 < size < 1600)
+        self.assertTrue(1300 < size < 1400)
+
+        result = view('images', 'Image', whitelist=['description', 'title'])
+        self.assertEquals('No images found', result)
+
+        result = view('images', 'Image', blacklist=['image'])
+        self.assertEquals('No images found', result)
+
+        # make sure the ADDITIONAL_MAPPING dict is always fresh
+        result = json.loads(view('json', 'Image'))[0]
+        self.assertIn('url', result)
+        self.assertIn('id', result)
+        self.assertIn('uid', result)
 
     def test_files_export(self):
         file1 = api.content.create(
@@ -172,7 +195,26 @@ class TestExport(unittest.TestCase):
             view.request.response.headers['content-disposition'],
             'attachment; filename="files.zip"')
         size = int(view.request.response.headers['content-length'])
-        self.assertTrue(1500 < size < 1600)
+        self.assertTrue(1300 < size < 1400)
+
+    def test_overriding(self):
+        image = api.content.create(
+            self.portal,
+            'Image',
+            'image1',
+            u'❤︎ly Pløne Image')
+        image.description = "This is my image."
+        image.image = dummy_image()
+        view = api.content.get_view('export_view', self.portal, self.request)
+
+        def _get_imagename(obj):
+            if obj.image:
+                return obj.image.filename
+
+        additional = {'image': _get_imagename}
+        result = view(
+            export_type='json', portal_type='Image', additional=additional)
+        self.assertEqual(json.loads(result)[0]['image'], u'image.png')
 
     def test_relations_export(self):
         image = api.content.create(
@@ -208,7 +250,7 @@ class TestExport(unittest.TestCase):
             view.request.response.headers['content-disposition'],
             'attachment; filename="related.zip"')
         size = int(view.request.response.headers['content-length'])
-        self.assertTrue(3050 < size < 3150)
+        self.assertTrue(2750 < size < 2800)
 
         view = api.content.get_view('export_view', self.portal, self.request)
         results = view(export_type='json', portal_type='Document')
@@ -220,6 +262,23 @@ class TestExport(unittest.TestCase):
         # TODO: Fix this
         self.assertIn(
             'http://nohost/plone/file-without-blob/@@download/file', related)
+
+        # make sure blacklist and whitelist work for related
+        results = view(
+            export_type='related',
+            portal_type='Document',
+            blacklist=['relatedItems'])
+        self.assertEqual('No related found', results)
+        results = view(
+            export_type='related',
+            portal_type='Document',
+            whitelist=['relatedItems'])
+        self.assertIsNone(results)
+        self.assertEqual(
+            view.request.response.headers['content-disposition'],
+            'attachment; filename="related.zip"')
+        size = int(view.request.response.headers['content-length'])
+        self.assertTrue(2750 < size < 2800)
 
     def test_iterables_fallback_format(self):
         query = [{

@@ -30,6 +30,8 @@ Exports dexterity content in various formats:
 - zip-file containing all files from file-fields
 - zip-file containing related files and images from relationfields
 
+.. figure:: docs/export_screenshot.png
+   :align: center
 
 Usage
 -----
@@ -45,6 +47,55 @@ The form allows you to:
 - Select the format for files and images (url, base64, location within zip-file)
 
 collective.contentexport uses `tablib <https://pypi.python.org/pypi/tablib>`_ for several export-formats.
+
+
+Use in code
+-----------
+
+You can use the ``export_view`` in code to have more control over the results.
+
+The view ``export_view`` accepts the following parameters:
+
+- export_type
+- portal_type
+- blob_format
+- richtext_format
+- blacklist
+- whitelist
+- additional
+
+The following example creates a zip-file with images or files from the field ``primary_picture`` for the type ``some_type``:
+
+..  code-block:: python
+
+    view = api.content.get_view('export_view', portal, request)
+    view(export_type='related', portal_type='some_type', whitelist='primary_picture')
+
+You can also extend the export.
+In the following example the value ``some_fieldname`` is being extracted from the object using the method ``_somehandler``.
+
+..  code-block:: python
+
+    def _somehandler(obj):
+        return some_crazy_transform(obj.custom_field)
+
+    additional = {'some_fieldname': _somehandler}
+    view = api.content.get_view('export_view', portal, request)
+    result = view(export_type='json', portal_type='Document', additional=additional)
+
+You can also override the default methods to modify the default behavior.
+In the following example the ``image`` from Images is being extracted using the method ``_get_imagename`` that only dumps the filename of the image:
+
+..  code-block:: python
+
+    def _get_imagename(obj):
+        if obj.image:
+            return obj.image.filename
+
+    additional = {'image': _get_imagename}
+    view = api.content.get_view('export_view', portal, request)
+    result = view(export_type='json', portal_type='Image', additional=additional)
+
 
 Compatability
 -------------

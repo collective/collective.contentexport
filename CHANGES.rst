@@ -5,7 +5,11 @@ Changelog
 1.0b2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add whitelist (only export fields in the whitelist)
+  [pbauer]
+
+- Document extending and overriding the export.
+  [pbauer]
 
 
 1.0b1 (2015-11-05)

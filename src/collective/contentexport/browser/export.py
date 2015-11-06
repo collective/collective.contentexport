@@ -60,11 +60,6 @@ def _uid(obj):
 # This is a dict of headername and method to get additional useful date
 # from the objects. This can also be used to override the getters fields with
 # the same name to use custom methods to get data.
-ADDITIONAL_MAPPING = {
-    'id': _id,
-    'url': _url,
-    'uid': _uid,
-}
 
 
 class ExportView(BrowserView):
@@ -94,7 +89,6 @@ class ExportView(BrowserView):
         base64: base64-encoded string
     :type blob_format: string
 
-
     :param richtext_format: the mimetype to which to transform richtext
         html (default)
         plain/text:
@@ -103,48 +97,78 @@ class ExportView(BrowserView):
     :param blacklist: List of fieldnames to omit
     :type blacklist: list
 
-    :param additional: Additional data to export (Not yet implemented)
+    :param whitelist: List of fieldnames to export
+    :type whitelist: list
+
+    :param additional: Additional data to export
         A dict with a name (for the heading) and a callable
         method to get additional data for the export from the obj.
-
-        This is not yet implemented and so far only adds id, url and uid
-        of the object
-    :param additional: dict
         {'id': 'Name (string) of the exported value>,
          'method': <callable that takes the obj as sole argument>}
+    :type additional: dict
 
     """
 
     template = ViewPageTemplateFile('templates/export_form.pt')
 
-    def __call__(
+    def __call__(  # noqa (prevents complaint about code-complexity)
         self,
         export_type=None,
         portal_type=None,
         blob_format='url',
         richtext_format='html',
         blacklist=None,
+        whitelist=None,
         additional=None,
     ):
         """Export data in various formats."""
         if not export_type or not portal_type or not blob_format:
+            api.portal.show_message(
+                u'You need to pass portal_type and blob_format', self.request)
             return self.template()
+
+        if blacklist and whitelist:
+            api.portal.show_message(
+                u'You can only specify whitelits or blacklist', self.request)
+            return self.template()
+
+        self.ADDITIONAL_MAPPING = {
+            'id': _id,
+            'url': _url,
+            'uid': _uid,
+        }
 
         if not blacklist:
             blacklist = []
+        else:
+            # remove blacklisted items from ADDITIONAL_MAPPING
+            [self.ADDITIONAL_MAPPING.pop(b) for b in blacklist
+             if b in self.ADDITIONAL_MAPPING]
+
+        if not whitelist:
+            whitelist = []
+        else:
+            # only keep whitelisted items in ADDITIONAL_MAPPING
+            for key in self.ADDITIONAL_MAPPING.keys():
+                if key not in whitelist:
+                    self.ADDITIONAL_MAPPING.pop(key)
 
         if additional:
-            ADDITIONAL_MAPPING.update(additional)
+            self.ADDITIONAL_MAPPING.update(additional)
 
         if export_type in ['images', 'files', 'related']:
             return self.export_blobs(
-                portal_type, blob_type=export_type, blacklist=blacklist)
+                portal_type,
+                blob_type=export_type,
+                blacklist=blacklist,
+                whitelist=whitelist)
 
         data = self.get_export_data(
             portal_type,
             blob_format,
             richtext_format,
-            blacklist)
+            blacklist,
+            whitelist)
 
         dataset = tablib.Dataset()
         dataset.dict = data
@@ -199,13 +223,14 @@ class ExportView(BrowserView):
         portal_type,
         blob_format,
         richtext_format,
-        blacklist
+        blacklist,
+        whitelist,
     ):
         """Return a list of dicts with a dict for each object.
 
         The key is the name of the field/value and the value the value.
         """
-        all_fields = get_schema_info(portal_type, blacklist)
+        all_fields = get_schema_info(portal_type, blacklist, whitelist)
 
         results = []
         catalog = api.portal.get_tool('portal_catalog')
@@ -219,7 +244,7 @@ class ExportView(BrowserView):
             item_dict = dict()
 
             for fieldname, field in all_fields:
-                if fieldname in ADDITIONAL_MAPPING:
+                if fieldname in self.ADDITIONAL_MAPPING:
                     # The way to access the value from this fields is
                     # overridden in ADDITIONAL_MAPPING
                     continue
@@ -259,15 +284,15 @@ class ExportView(BrowserView):
                 item_dict[fieldname] = value
 
             # Update the data with additional info or overridden getters
-            item_dict.update(additional_data(obj, blacklist))
+            item_dict.update(self.additional_data(obj, blacklist))
 
             results.append(item_dict)
         return results
 
-    def export_blobs(self, portal_type, blob_type, blacklist):
+    def export_blobs(self, portal_type, blob_type, blacklist, whitelist):
         """Return a zip-file with file and/or images  for the required export.
         """
-        all_fields = get_schema_info(portal_type, blacklist)
+        all_fields = get_schema_info(portal_type, blacklist, whitelist)
         if blob_type == 'images':
             fields = [
                 i for i in all_fields if
@@ -295,7 +320,7 @@ class ExportView(BrowserView):
         for brain in catalog(query):
             obj = brain.getObject()
             for fieldname, field in fields:
-                # manualy filter for fields
+                # manually filter for fields
                 # if fieldname not in ['primary_picture']:
                 #     continue
                 blobs = []
@@ -353,6 +378,17 @@ class ExportView(BrowserView):
                 })
         return sorted(results, key=itemgetter('title'))
 
+    def additional_data(self, obj, blacklist):
+        """Create a dict with fieldname: data from ADDITIONAL_MAPPING.
+
+        By default this makes sure the url, uid and id of the objects is
+        created.
+        """
+        item_dict = {}
+        for headername in self.ADDITIONAL_MAPPING:
+            item_dict[headername] = self.ADDITIONAL_MAPPING[headername](obj)
+        return item_dict
+
 
 def get_blobs_from_relations(value, field):
     """Extract the blobs from relationfields.
@@ -378,28 +414,19 @@ def get_blobs_from_relations(value, field):
     return blobs
 
 
-def additional_data(obj, blacklist):
-    """Create a dict with fieldname: data from ADDITIONAL_MAPPING.
-
-    By default this makes sure the url, uid and id of the objects is
-    created.
-    """
-    item_dict = {}
-    for headername in ADDITIONAL_MAPPING:
-        if headername not in blacklist:
-            item_dict[headername] = ADDITIONAL_MAPPING[headername](obj)
-    return item_dict
-
-
-def get_schema_info(portal_type, blacklist=None):
+def get_schema_info(portal_type, blacklist=None, whitelist=None):
     """Get a flat list of all fields in all schemas for a content-type.
     """
-    if blacklist is None:
-        blacklist = []
     fields = []
     for schema in iterSchemataForType(portal_type):
         for fieldname in schema:
-            if fieldname not in blacklist:
+            if blacklist:
+                if fieldname not in blacklist:
+                    fields.append((fieldname, schema.get(fieldname)))
+            elif whitelist:
+                if fieldname in whitelist:
+                    fields.append((fieldname, schema.get(fieldname)))
+            elif not blacklist and not whitelist:
                 fields.append((fieldname, schema.get(fieldname)))
     return fields
 
