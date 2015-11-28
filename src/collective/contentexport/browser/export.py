@@ -107,6 +107,9 @@ class ExportView(BrowserView):
          'method': <callable that takes the obj as sole argument>}
     :type additional: dict
 
+    :param query: A catalog-query to filter the exported items.
+    :type additional: dict
+
     """
 
     template = ViewPageTemplateFile('templates/export_form.pt')
@@ -120,6 +123,7 @@ class ExportView(BrowserView):
         blacklist=None,
         whitelist=None,
         additional=None,
+        query=None,
     ):
         """Export data in various formats."""
         if not export_type or not portal_type or not blob_format:
@@ -168,7 +172,8 @@ class ExportView(BrowserView):
             blob_format,
             richtext_format,
             blacklist,
-            whitelist)
+            whitelist,
+            query)
 
         dataset = tablib.Dataset()
         dataset.dict = data
@@ -225,6 +230,7 @@ class ExportView(BrowserView):
         richtext_format,
         blacklist,
         whitelist,
+        query,
     ):
         """Return a list of dicts with a dict for each object.
 
@@ -234,8 +240,11 @@ class ExportView(BrowserView):
 
         results = []
         catalog = api.portal.get_tool('portal_catalog')
-        query = {'portal_type': portal_type}
-        if HAS_MULTILINGUAL and 'Language' in catalog.indexes():
+        if not query:
+            query = dict()
+        query['portal_type'] = portal_type
+        if 'Language' not in query and HAS_MULTILINGUAL and \
+                'Language' in catalog.indexes():
             query['Language'] = 'all'
 
         brains = catalog(query)

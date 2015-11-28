@@ -5,7 +5,8 @@ Changelog
 1.0b4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Allow to pass catalog-query to filter the exported content.
+  [pbauer]
 
 
 1.0b3 (2015-11-28)

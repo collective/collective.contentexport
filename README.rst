@@ -62,13 +62,48 @@ You can use the ``collective_contentexport_view`` in code to have more control o
 
 The view ``collective_contentexport_view`` accepts the following parameters:
 
-- export_type
-- portal_type
-- blob_format
-- richtext_format
-- blacklist
-- whitelist
-- additional
+export_type
+    The export-format you want to use. Accepts the following options:
+
+    - xlsx (Excel Spreadsheet (xlsx))
+    - xls (Excel Legacy Spreadsheet (xls))
+    - yaml (YAML)
+    - html (HTML Table)
+    - csv (Comma Separated Values File)
+    - tsv (Tab Separated Values File)
+    - json (JSON Dump)
+    - images (Export images as zip)
+    - files (Export files as zip)
+    - related (Export related files and images as zip)
+
+portal_type
+    The content-type you want to export
+
+blob_format
+    The format in which blobs (filed/images) should be exported. Accepts the following options:
+
+    - url (URL)
+    - base64 (Base64-encoded string)
+    - zip_path (Location within the a zip)
+
+richtext_format
+    The format in which richtext (html) should be exported. Options:
+
+    - html
+    - text/plain
+
+blacklist
+    Fields that should be ommited from the export (cannot be combined with whitelist).
+
+whitelist
+    Only these fields should be included in the export (cannot be combined with blacklist).
+
+additional
+    Additional data to export. A dict with a name (for the heading) as key and a callable method as value to get additional data for the export from the objects.
+
+query
+    Catalog-query to filter the exported content.
+
 
 The following example creates a zip-file with images or files from the field ``primary_picture`` for the type ``some_type``:
 
@@ -76,6 +111,14 @@ The following example creates a zip-file with images or files from the field ``p
 
     view = api.content.get_view('collective_contentexport_view', portal, request)
     view(export_type='related', portal_type='some_type', whitelist='primary_picture')
+
+You can filter the items that should be exported by passing a catalog-query:
+
+..  code-block:: python
+
+    path = '/'.join(self.context.getPhysicalPath())
+    view = api.content.get_view('collective_contentexport_view', portal, request)
+    view(export_type='json', portal_type='Document', query={'review_state': 'published', 'path': path})
 
 You can also extend the export.
 In the following example the value ``some_fieldname`` is being extracted from the object using the method ``_somehandler``.

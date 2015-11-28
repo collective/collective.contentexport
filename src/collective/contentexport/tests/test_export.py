@@ -323,3 +323,38 @@ class TestExport(unittest.TestCase):
         self.assertIn(
             '<input type="checkbox" value="relatedItems" name="blacklist" id="relatedItems">',  # noqa
             results)
+
+    def test_passed_query(self):
+        folder = api.content.create(
+            self.portal,
+            'Folder',
+            'folder1',
+            u'I äm a folder')
+        doc2 = api.content.create(
+            folder,
+            'Document',
+            'doc2',
+            u'I also ❤︎ the Pløne')
+        api.content.transition(doc2, to_state='published')
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
+        result = view('json', 'Document')
+        self.assertEqual(len(json.loads(result)), 2)
+
+        # passing a portal type is ignored
+        result = view('json', 'Document', query={'portal_type': 'Folder'})
+        self.assertEqual(len(json.loads(result)), 2)
+
+        # filter by state
+        result = view('json', 'Document', query={'review_state': 'published'})
+        self.assertEqual(len(json.loads(result)), 1)
+        result = view('json', 'Document', query={'review_state': 'private'})
+        self.assertEqual(len(json.loads(result)), 1)
+
+        # filter by path
+        path = '/'.join(folder.getPhysicalPath())
+        result = view('json', 'Document', query={'path': path})
+        self.assertEqual(len(json.loads(result)), 1)
+        result = view(
+            'json', 'Document', query={'path': {'path': path, 'depth': 0}})
+        self.assertEqual(len(json.loads(result)), 0)
