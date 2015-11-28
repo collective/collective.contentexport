@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0b4 (unreleased)
+1.0b4 (2015-11-28)
 ------------------
 
 - Allow to pass catalog-query to filter the exported content.
