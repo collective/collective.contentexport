@@ -5,6 +5,9 @@ Changelog
 1.0b3 (unreleased)
 ------------------
 
+- Move package to collective.
+  [pbauer]
+
 - No longer bind views to browserlayer to simplify package-use. Rename views
   to prevent unintended name-clashes since we no longer use the browser-layer.
   [pbauer]

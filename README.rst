@@ -2,11 +2,11 @@
    If you want to learn more about writing documentation, please check out: http://docs.plone.org/about/documentation_styleguide_addons.html
    This text does not appear on pypi or github. It is a comment.
 
-.. image:: https://travis-ci.org/starzel/collective.contentexport.svg?branch=master
-    :target: https://travis-ci.org/starzel/collective.contentexport
+.. image:: https://travis-ci.org/collective/collective.contentexport.svg?branch=master
+    :target: https://travis-ci.org/collective/collective.contentexport
 
-.. image:: https://coveralls.io/repos/starzel/collective.contentexport/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/starzel/collective.contentexport?branch=master
+.. image:: https://coveralls.io/repos/collective/collective.contentexport/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/collective/collective.contentexport?branch=master
 
 .. image:: https://img.shields.io/pypi/v/collective.contentexport.svg
     :target: https://pypi.python.org/pypi/collective.contentexport
@@ -130,14 +130,14 @@ You don't need to install the add-on to use the export.
 Contribute
 ----------
 
-- Issue Tracker: https://github.com/starzel/collective.contentexport/issues
-- Source Code: https://github.com/starzel/collective.contentexport
+- Issue Tracker: https://github.com/collective/collective.contentexport/issues
+- Source Code: https://github.com/collective/collective.contentexport
 
 
 Support
 -------
 
-If you are having issues, please let us know at https://github.com/starzel/collective.contentexport/issues.
+If you are having issues, please let us know at https://github.com/collective/collective.contentexport/issues.
 
 
 License
