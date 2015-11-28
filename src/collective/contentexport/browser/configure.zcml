@@ -19,18 +19,16 @@
 
   <browser:page
       for="*"
-      name="export_view"
-      permission="cmf.ManagePortal"
+      name="collective_contentexport_view"
       class=".export.ExportView"
       template="templates/export_form.pt"
-      layer="..interfaces.ICollectiveContentexportLayer"
+      permission="cmf.ManagePortal"
       />
 
   <browser:page
-      name="dx_fields"
+      name="collective_contentexport_dx_fields"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".export.DXFields"
-      layer="..interfaces.ICollectiveContentexportLayer"
       template="templates/fieldnames.pt"
       permission="cmf.ManagePortal"
       />

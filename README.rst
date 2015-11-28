@@ -8,11 +8,15 @@
 .. image:: https://coveralls.io/repos/starzel/collective.contentexport/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/starzel/collective.contentexport?branch=master
 
+.. image:: https://img.shields.io/pypi/v/collective.contentexport.svg
+    :target: https://pypi.python.org/pypi/collective.contentexport
+
+.. image:: https://img.shields.io/pypi/l/collective.contentexport.svg
+
 
 ==============================================================================
 collective.contentexport
 ==============================================================================
-
 
 Features
 --------
@@ -30,13 +34,15 @@ Exports dexterity content in various formats:
 - zip-file containing all files from file-fields
 - zip-file containing related files and images from relationfields
 
+It can be used to export all instances of a dexterity type and all its data. It cannot be used to export a folder-structure of content.
+
 .. figure:: docs/export_screenshot.png
    :align: center
 
 Usage
 -----
 
-Provides a form ``/@@export_view`` to configure the export.
+Provides a form ``/@@collective_contentexport_view`` to configure the export.
 
 The form allows you to:
 
@@ -52,9 +58,9 @@ collective.contentexport uses `tablib <https://pypi.python.org/pypi/tablib>`_ fo
 Use in code
 -----------
 
-You can use the ``export_view`` in code to have more control over the results.
+You can use the ``collective_contentexport_view`` in code to have more control over the results.
 
-The view ``export_view`` accepts the following parameters:
+The view ``collective_contentexport_view`` accepts the following parameters:
 
 - export_type
 - portal_type
@@ -68,7 +74,7 @@ The following example creates a zip-file with images or files from the field ``p
 
 ..  code-block:: python
 
-    view = api.content.get_view('export_view', portal, request)
+    view = api.content.get_view('collective_contentexport_view', portal, request)
     view(export_type='related', portal_type='some_type', whitelist='primary_picture')
 
 You can also extend the export.
@@ -80,7 +86,7 @@ In the following example the value ``some_fieldname`` is being extracted from th
         return some_crazy_transform(obj.custom_field)
 
     additional = {'some_fieldname': _somehandler}
-    view = api.content.get_view('export_view', portal, request)
+    view = api.content.get_view('collective_contentexport_view', portal, request)
     result = view(export_type='json', portal_type='Document', additional=additional)
 
 You can also override the default methods to modify the default behavior.
@@ -93,7 +99,7 @@ In the following example the ``image`` from Images is being extracted using the 
             return obj.image.filename
 
     additional = {'image': _get_imagename}
-    view = api.content.get_view('export_view', portal, request)
+    view = api.content.get_view('collective_contentexport_view', portal, request)
     result = view(export_type='json', portal_type='Image', additional=additional)
 
 
@@ -116,7 +122,9 @@ Install collective.contentexport by adding it to your buildout::
         collective.contentexport
 
 
-and then running ``bin/buildout``
+and then running ``bin/buildout``.
+
+You don't need to install the add-on to use the export.
 
 
 Contribute

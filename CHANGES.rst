@@ -5,7 +5,9 @@ Changelog
 1.0b3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- No longer bind views to browserlayer to simplify package-use. Rename views
+  to prevent unintended name-clashes since we no longer use the browser-layer.
+  [pbauer]
 
 
 1.0b2 (2015-11-06)

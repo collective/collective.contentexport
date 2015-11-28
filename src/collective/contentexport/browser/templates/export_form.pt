@@ -9,11 +9,11 @@
 
 <metal:content-core fill-slot="main">
 
-    <form tal:attributes="action string:${context/absolute_url}/@@export_view">
+    <form tal:attributes="action string:${context/absolute_url}/@@collective_contentexport_view">
       <script type="text/javascript">
       function getDXFields(dx_typename) {
           $.ajax({
-              url: '@@dx_fields',
+              url: '@@collective_contentexport_dx_fields',
               dataType: 'html',
               data: {'portal_type': dx_typename},
               cache: false,
