@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0b3 (unreleased)
+1.0b3 (2015-11-28)
 ------------------
 
 - Move package to https://github.com/collective/collective.contentexport.
