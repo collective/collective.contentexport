@@ -57,10 +57,11 @@ class TestExport(unittest.TestCase):
 
     def test_export_form_renders(self):
         """Test if the export_form can be rendered."""
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         results = view()
         self.assertIn(
-            '<form action="http://nohost/plone/@@collective_contentexport_view">', results)
+            '<form action="http://nohost/plone/@@collective_contentexport_view">', results)  # noqa
         self.assertIn(
             '<option value="Document" title="Page">Page (1)</option>', results)
 
@@ -76,7 +77,8 @@ class TestExport(unittest.TestCase):
             'text/html')
         doc2.subject = (u'❤', u'Plone')
         doc2.description = u'Ich mag Sönderzeichen'
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         results = view(
             export_type='json',
             portal_type='Document',
@@ -96,7 +98,8 @@ class TestExport(unittest.TestCase):
             u"Lorem ❤︎ ipsum",
             'text/plain',
             'text/html')
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         for export_format in formats:
             results = view(export_type=export_format, portal_type='Document')
             self.assertTrue(results)
@@ -109,7 +112,8 @@ class TestExport(unittest.TestCase):
             u'❤︎ly Pløne Image')
         image.description = "This is my image."
         image.image = dummy_image()
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
 
         results = view(
             export_type='json', portal_type='Image', blob_format='url')
@@ -132,7 +136,8 @@ class TestExport(unittest.TestCase):
         self.assertEquals(1580, len(results[0]['image']))
 
     def test_blacklist(self):
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         result = view('json', 'Document', blacklist=[])
         length = len(json.loads(result)[0])
         result = view('json', 'Document', blacklist=['id'])
@@ -143,7 +148,8 @@ class TestExport(unittest.TestCase):
             len(json.loads(result)[0]), length - 3)
 
     def test_whitelist(self):
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         result = view('json', 'Document', whitelist=['id'])
         self.assertEqual(len(json.loads(result)[0]), 1)
 
@@ -161,7 +167,8 @@ class TestExport(unittest.TestCase):
             u'❤︎ly Pløne Image')
         image.description = "This is my image."
         image.image = dummy_image()
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         view(export_type='images', portal_type='Image')
         self.assertEqual(
             view.request.response.headers['content-disposition'],
@@ -189,7 +196,8 @@ class TestExport(unittest.TestCase):
             u'❤︎ly Pløne File')
         file1.description = "This is my file."
         file1.file = dummy_image()
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         view(export_type='files', portal_type='File')
         self.assertEqual(
             view.request.response.headers['content-disposition'],
@@ -205,7 +213,8 @@ class TestExport(unittest.TestCase):
             u'❤︎ly Pløne Image')
         image.description = "This is my image."
         image.image = dummy_image()
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
 
         def _get_imagename(obj):
             if obj.image:
@@ -244,7 +253,8 @@ class TestExport(unittest.TestCase):
         doc.relatedItems.append(RelationValue(intids.getId(file1)))
         doc.relatedItems.append(RelationValue(intids.getId(file_without_blob)))
         modified(doc)
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         view(export_type='related', portal_type='Document')
         self.assertEqual(
             view.request.response.headers['content-disposition'],
@@ -252,7 +262,8 @@ class TestExport(unittest.TestCase):
         size = int(view.request.response.headers['content-length'])
         self.assertTrue(2750 < size < 2800)
 
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         results = view(export_type='json', portal_type='Document')
         results = json.loads(results)
         related = results[0]['relatedItems']
@@ -295,7 +306,8 @@ class TestExport(unittest.TestCase):
         self.assertEquals(
             [i for i in coll.results()][0].getObject(),
             self.portal['doc1'])
-        view = api.content.get_view('collective_contentexport_view', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_view', self.portal, self.request)
         results = view(export_type='json', portal_type='Collection')
         results = json.loads(results)
         self.assertEquals(
@@ -305,7 +317,8 @@ class TestExport(unittest.TestCase):
               u'v': u'I \u2764\ufe0e the Pl\xf8ne'}])
 
     def test_dx_fields(self):
-        view = api.content.get_view('collective_contentexport_dx_fields', self.portal, self.request)
+        view = api.content.get_view(
+            'collective_contentexport_dx_fields', self.portal, self.request)
         results = view(portal_type='Document')
         self.assertIn(
             '<input type="checkbox" value="relatedItems" name="blacklist" id="relatedItems">',  # noqa
