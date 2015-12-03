@@ -5,7 +5,11 @@ Changelog
 1.0b5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix UnicodeEncodeError in get_blob_url when filenames have special characters.
+  [pbauer]
+
+- Add path and review_state to exported data that is not part of the schema.
+  [pbauer]
 
 
 1.0b4 (2015-11-28)
