@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0b5 (unreleased)
+1.0b5 (2015-12-03)
 ------------------
 
 - Fix UnicodeEncodeError in get_blob_url when filenames have special characters.
