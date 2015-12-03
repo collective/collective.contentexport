@@ -463,11 +463,11 @@ def get_url_for_relation(rel):
 
 def get_blob_url(value, brain, blob_format, fieldname):
     if blob_format == 'url':
-        value = '{0}/@@download/{1}'.format(
+        value = u'{0}/@@download/{1}'.format(
             brain.getURL(), fieldname)
     if blob_format == 'zip_path':
         filename = safe_unicode(value.filename).split('/')[-1]
-        value = '{0}/{1}'.format(brain.UID, filename)
+        value = u'{0}/{1}'.format(brain.UID, filename)
     if blob_format == 'base64':
         value = base64.b64encode(value.data)
     return value
