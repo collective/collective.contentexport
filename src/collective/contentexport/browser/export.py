@@ -57,6 +57,14 @@ def _id(obj):
 def _uid(obj):
     return api.content.get_uuid(obj)
 
+
+def _path(obj):
+    return '/'.join(obj.getPhysicalPath())
+
+
+def _review_state(obj):
+    return api.content.get_state(obj, default=None)
+
 # This is a dict of headername and method to get additional useful date
 # from the objects. This can also be used to override the getters fields with
 # the same name to use custom methods to get data.
@@ -140,6 +148,8 @@ class ExportView(BrowserView):
             'id': _id,
             'url': _url,
             'uid': _uid,
+            'path': _path,
+            'review_state': _review_state,
         }
 
         if not blacklist:
