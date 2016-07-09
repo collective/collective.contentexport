@@ -2,8 +2,8 @@ Changelog
 =========
 
 
-1.0b6 (unreleased)
-------------------
+1.0 (2016-07-09)
+----------------
 
 - Fix tsv-Export
   [pbauer]
