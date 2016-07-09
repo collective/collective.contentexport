@@ -13,14 +13,11 @@ before_install:
   - echo "download-cache = $HOME/buildout-cache/downloads" >> $HOME/.buildout/default.cfg
   - echo "eggs-directory = $HOME/buildout-cache/eggs" >> $HOME/.buildout/default.cfg
 install:
-  - python bootstrap-buildout.py -c travis.cfg --setuptools-version=18.1
+  - python bootstrap-buildout.py -c travis.cfg --setuptools-version=21.0.0
   - bin/buildout -Nc travis.cfg
-before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
 script:
   - bin/code-analysis
-  - bin/test --all
+  - bin/test
 after_success:
   - bin/createcoverage
   - pip install coveralls==0.5
