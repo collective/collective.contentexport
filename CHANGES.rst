@@ -5,7 +5,11 @@ Changelog
 1.0b6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix tsv-Export
+  [pbauer]
+
+- Test compatibility with Plone 5.0.5
+  [pbauer]
 
 
 1.0b5 (2015-12-03)
