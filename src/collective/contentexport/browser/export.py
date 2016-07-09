@@ -206,7 +206,7 @@ class ExportView(BrowserView):
             return self.export_file(result, portal_type, 'text/csv', 'csv')
 
         if export_type == 'tsv':
-            return dataset.tsv
+            result = dataset.tsv
             return self.export_file(
                 result, portal_type, 'text/tab-separated-values', 'tsv')
 
