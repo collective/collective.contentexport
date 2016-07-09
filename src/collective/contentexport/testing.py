@@ -5,6 +5,8 @@ from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.testing import z2
 
 import collective.contentexport
@@ -19,6 +21,8 @@ class CollectiveContentexportLayer(PloneSandboxLayer):
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.contentexport:default')
+        portal.acl_users.userFolderAddUser(
+            SITE_OWNER_NAME, SITE_OWNER_PASSWORD, ['Manager'], [])
 
 
 COLLECTIVE_CONTENTEXPORT_FIXTURE = CollectiveContentexportLayer()

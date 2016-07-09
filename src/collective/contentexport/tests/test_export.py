@@ -3,13 +3,15 @@
 from collective.contentexport.testing import COLLECTIVE_CONTENTEXPORT_INTEGRATION_TESTING  # noqa
 from persistent.list import PersistentList
 from plone import api
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import login
 from plone.app.textfield.value import RichTextValue
 from z3c.relationfield import RelationValue
 from zope.component import getUtility
 from zope.intid.interfaces import IIntIds
 from zope.lifecycleevent import modified
-import os
 import json
+import os
 import unittest
 
 formats = [
@@ -44,6 +46,8 @@ class TestExport(unittest.TestCase):
         """Custom shared utility setup for tests."""
         self.portal = self.layer['portal']
         self.request = self.layer['request']
+        login(self.portal, SITE_OWNER_NAME)
+
         document = api.content.create(
             self.portal,
             'Document',
