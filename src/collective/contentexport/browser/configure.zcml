@@ -22,6 +22,7 @@
       name="collective_contentexport_view"
       class=".export.ExportView"
       template="templates/export_form.pt"
+      layer="collective.contentexport.interfaces.ICollectiveContentexportLayer"
       permission="cmf.ManagePortal"
       />
 
@@ -30,6 +31,7 @@
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class=".export.DXFields"
       template="templates/fieldnames.pt"
+      layer="collective.contentexport.interfaces.ICollectiveContentexportLayer"
       permission="cmf.ManagePortal"
       />
 

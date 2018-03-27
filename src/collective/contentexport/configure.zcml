@@ -11,21 +11,14 @@
 
   <include package=".browser" />
 
-
   <genericsetup:registerProfile
       name="default"
       title="collective.contentexport"
       directory="profiles/default"
       description="Installs the collective.contentexport add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_install"
       />
-
-  <genericsetup:importStep
-      name="collective.contentexport-postInstall"
-      title="collective.contentexport post_install import step"
-      description="Post install import step from collective.contentexport"
-      handler=".setuphandlers.post_install">
-  </genericsetup:importStep>
 
   <genericsetup:registerProfile
       name="uninstall"
@@ -33,14 +26,8 @@
       directory="profiles/uninstall"
       description="Uninstalls the collective.contentexport add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.uninstall"
       />
-
-  <genericsetup:importStep
-      name="collective.contentexport-uninstall"
-      title="collective.contentexport uninstall import step"
-      description="Import step run during ininstalling collective.contentexport"
-      handler=".setuphandlers.uninstall">
-  </genericsetup:importStep>
 
   <utility
       factory=".setuphandlers.HiddenProfiles"
