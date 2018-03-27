@@ -5,8 +5,14 @@ Changelog
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add modification date to default fields
+  [pbauer]
 
+- Add export-view to controlpanel
+  [pbauer]
+
+- Run tests with Plone 5.1
+  [pbauer]
 
 1.0 (2016-07-09)
 ----------------

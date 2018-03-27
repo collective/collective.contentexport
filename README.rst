@@ -42,7 +42,7 @@ It can be used to export all instances of a dexterity type and all its data. It 
 Usage
 -----
 
-Provides a form ``/@@collective_contentexport_view`` to configure the export.
+Provides a form ``/@@collective_contentexport_view`` to configure the export. The form is also availabe in the main controlpanel as `Content export`.
 
 The form allows you to:
 
@@ -149,7 +149,13 @@ In the following example the ``image`` from Images is being extracted using the 
 Compatability
 -------------
 
-collective.contentexport is tested to work in Plone 4 and Plone 5.
+collective.contentexport is tested to work in Plone 4.3, Plone 5 and PLone 5.1.
+
+
+Known Issues
+------------
+
+* xslx-Export is broken unless you pinn ``openpyxl = 2.4.9``. See https://github.com/collective/collective.contentexport/issues/4 for details.
 
 
 Installation
