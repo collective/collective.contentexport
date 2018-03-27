@@ -3,16 +3,18 @@
 from collective.contentexport.testing import COLLECTIVE_CONTENTEXPORT_INTEGRATION_TESTING  # noqa
 from persistent.list import PersistentList
 from plone import api
-from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import login
+from plone.app.testing import SITE_OWNER_NAME
 from plone.app.textfield.value import RichTextValue
 from z3c.relationfield import RelationValue
 from zope.component import getUtility
 from zope.intid.interfaces import IIntIds
 from zope.lifecycleevent import modified
+
 import json
 import os
 import unittest
+
 
 formats = [
     'xlsx',
@@ -88,9 +90,9 @@ class TestExport(unittest.TestCase):
             portal_type='Document',
             richtext_format='text/plain')
         results = json.loads(results)
-        self.assertEquals(u'❤, Plone', results[1]['subjects'])
-        self.assertEquals(u' Lorem ❤︎ ipsum ', results[1]['text'])
-        self.assertEquals(doc2.description, results[1]['description'])
+        self.assertEqual(u'❤, Plone', results[1]['subjects'])
+        self.assertEqual(u' Lorem ❤︎ ipsum ', results[1]['text'])
+        self.assertEqual(doc2.description, results[1]['description'])
 
     def test_all_export_formats(self):
         doc2 = api.content.create(
@@ -99,7 +101,7 @@ class TestExport(unittest.TestCase):
             'doc2',
             u'I also ❤︎ the Pløne')
         doc2.text = RichTextValue(
-            u"Lorem ❤︎ ipsum",
+            u'Lorem ❤︎ ipsum',
             'text/plain',
             'text/html')
         view = api.content.get_view(
@@ -114,7 +116,7 @@ class TestExport(unittest.TestCase):
             'Image',
             'image1',
             u'❤︎ly Pløne Image')
-        image.description = "This is my image."
+        image.description = 'This is my image.'
         image.image = dummy_image()
         view = api.content.get_view(
             'collective_contentexport_view', self.portal, self.request)
@@ -122,22 +124,22 @@ class TestExport(unittest.TestCase):
         results = view(
             export_type='json', portal_type='Image', blob_format='url')
         results = json.loads(results)
-        self.assertEquals(len(results), 1)
-        self.assertEquals(
+        self.assertEqual(len(results), 1)
+        self.assertEqual(
             u'http://nohost/plone/image1/@@download/image',
             results[0]['image'])
 
         results = view(
             export_type='json', portal_type='Image', blob_format='zip_path')
         results = json.loads(results)
-        self.assertEquals(
+        self.assertEqual(
             u'{0}/image.png'.format(api.content.get_uuid(image)),
             results[0]['image'])
 
         results = view(
             export_type='json', portal_type='Image', blob_format='base64')
         results = json.loads(results)
-        self.assertEquals(1580, len(results[0]['image']))
+        self.assertEqual(1580, len(results[0]['image']))
 
     def test_blacklist(self):
         view = api.content.get_view(
@@ -161,7 +163,7 @@ class TestExport(unittest.TestCase):
         self.assertEqual(len(json.loads(result)[0]), 2)
 
         result = view('images', 'Document', whitelist=['description', 'title'])
-        self.assertEquals('No images found', result)
+        self.assertEqual('No images found', result)
 
     def test_images_export(self):
         image = api.content.create(
@@ -169,7 +171,7 @@ class TestExport(unittest.TestCase):
             'Image',
             'image1',
             u'❤︎ly Pløne Image')
-        image.description = "This is my image."
+        image.description = 'This is my image.'
         image.image = dummy_image()
         view = api.content.get_view(
             'collective_contentexport_view', self.portal, self.request)
@@ -181,10 +183,10 @@ class TestExport(unittest.TestCase):
         self.assertTrue(1300 < size < 1400)
 
         result = view('images', 'Image', whitelist=['description', 'title'])
-        self.assertEquals('No images found', result)
+        self.assertEqual('No images found', result)
 
         result = view('images', 'Image', blacklist=['image'])
-        self.assertEquals('No images found', result)
+        self.assertEqual('No images found', result)
 
         # make sure the ADDITIONAL_MAPPING dict is always fresh
         result = json.loads(view('json', 'Image'))[0]
@@ -198,7 +200,7 @@ class TestExport(unittest.TestCase):
             'File',
             'file1',
             u'❤︎ly Pløne File')
-        file1.description = "This is my file."
+        file1.description = 'This is my file.'
         file1.file = dummy_image()
         view = api.content.get_view(
             'collective_contentexport_view', self.portal, self.request)
@@ -215,7 +217,7 @@ class TestExport(unittest.TestCase):
             'Image',
             'image1',
             u'❤︎ly Pløne Image')
-        image.description = "This is my image."
+        image.description = 'This is my image.'
         image.image = dummy_image()
         view = api.content.get_view(
             'collective_contentexport_view', self.portal, self.request)
@@ -235,14 +237,14 @@ class TestExport(unittest.TestCase):
             'Image',
             'image1',
             u'❤︎ly Pløne Image')
-        image.description = "This is my image."
+        image.description = 'This is my image.'
         image.image = dummy_image()
         file1 = api.content.create(
             self.portal,
             'File',
             'file1',
             u'❤︎ly Pløne File')
-        file1.description = "This is my file."
+        file1.description = 'This is my file.'
         file1.file = dummy_image()
         file_without_blob = api.content.create(
             self.portal,
@@ -271,10 +273,9 @@ class TestExport(unittest.TestCase):
         results = view(export_type='json', portal_type='Document')
         results = json.loads(results)
         related = results[0]['relatedItems']
-        self.assertEquals(len(related.split(',')), 3)
+        self.assertEqual(len(related.split(',')), 3)
         self.assertIn('http://nohost/plone/image1/@@download/image', related)
         self.assertIn('http://nohost/plone/file1/@@download/file', related)
-        # TODO: Fix this
         self.assertIn(
             'http://nohost/plone/file-without-blob/@@download/file', related)
 
@@ -307,14 +308,14 @@ class TestExport(unittest.TestCase):
             'coll1',
             u'❤︎ly Collection',
             query=query)
-        self.assertEquals(
+        self.assertEqual(
             [i for i in coll.results()][0].getObject(),
             self.portal['doc1'])
         view = api.content.get_view(
             'collective_contentexport_view', self.portal, self.request)
         results = view(export_type='json', portal_type='Collection')
         results = json.loads(results)
-        self.assertEquals(
+        self.assertEqual(
             results[0]['query'],
             [{u'i': u'Title',
               u'o': u'plone.app.querystring.operation.string.contains',

@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-from Products.CMFPlone.utils import safe_callable
-from Products.CMFPlone.utils import safe_unicode
-from Products.Five.browser import BrowserView
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from operator import itemgetter
 from plone import api
 from plone.app.textfield.interfaces import IRichTextValue
@@ -13,17 +9,24 @@ from plone.namedfile.interfaces import INamedBlobFileField
 from plone.namedfile.interfaces import INamedBlobImageField
 from plone.namedfile.interfaces import INamedFileField
 from plone.namedfile.interfaces import INamedImageField
+from Products.CMFPlone.utils import safe_callable
+from Products.CMFPlone.utils import safe_unicode
+from Products.Five.browser import BrowserView
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from tempfile import NamedTemporaryFile
-from z3c.relationfield.interfaces import IRelationChoice, IRelationList
+from z3c.relationfield.interfaces import IRelationChoice
+from z3c.relationfield.interfaces import IRelationList
 from zope.i18n import translate
 from zope.schema.interfaces import IDate
 from zope.schema.interfaces import IDatetime
+
 import base64
 import json
 import logging
 import pkg_resources
 import tablib
 import zipfile
+
 
 # Is there a multilingual addon?
 try:
@@ -40,6 +43,7 @@ if not HAS_MULTILINGUAL:
         HAS_MULTILINGUAL = False
     else:
         HAS_MULTILINGUAL = True
+
 
 _marker = []
 log = logging.getLogger(__name__)
@@ -228,14 +232,14 @@ class ExportView(BrowserView):
             return pretty
 
     def export_file(self, result, portal_type, mimetype, extension):
-        filename = "{0}_export.{1}".format(portal_type, extension)
+        filename = '{0}_export.{1}'.format(portal_type, extension)
         with NamedTemporaryFile(mode='wb') as tmpfile:
             tmpfile.write(result)
             tmpfile.seek(0)
             self.request.response.setHeader('Content-Type', mimetype)
             self.request.response.setHeader(
                 'Content-Disposition',
-                'attachment; filename="%s"' % filename)
+                'attachment; filename="{0}"'.format(filename))
             return file(tmpfile.name).read()
 
     def get_export_data(
@@ -526,7 +530,7 @@ class DXFields(BrowserView):
             class_name = field.__class__.__name__
             results.append({
                 'id': fieldname,
-                'title': '%s (%s)' % (translated_title, class_name),
+                'title': '{0} ({1})'.format(translated_title, class_name),
                 'type': class_name
             })
         self.fields = sorted(results, key=itemgetter('title'))
