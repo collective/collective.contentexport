@@ -65,6 +65,10 @@ def _path(obj):
 def _review_state(obj):
     return api.content.get_state(obj, default=None)
 
+
+def _modified(obj):
+    return api.portal.get_localized_time(obj.modified(), long_format=True)
+
 # This is a dict of headername and method to get additional useful date
 # from the objects. This can also be used to override the getters fields with
 # the same name to use custom methods to get data.
@@ -150,6 +154,7 @@ class ExportView(BrowserView):
             'uid': _uid,
             'path': _path,
             'review_state': _review_state,
+            'modified': _modified,
         }
 
         if not blacklist:
