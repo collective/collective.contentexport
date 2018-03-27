@@ -3,26 +3,27 @@ sudo: false
 cache:
   pip: true
   directories:
-    - $HOME/buildout-cache
+  - eggs
+  - downloads
 python:
-  - 2.7
-before_install:
-  - mkdir -p $HOME/buildout-cache/{eggs,downloads}
-  - mkdir $HOME/.buildout
-  - echo "[buildout]" > $HOME/.buildout/default.cfg
-  - echo "download-cache = $HOME/buildout-cache/downloads" >> $HOME/.buildout/default.cfg
-  - echo "eggs-directory = $HOME/buildout-cache/eggs" >> $HOME/.buildout/default.cfg
+  - "2.7"
+matrix:
+  fast_finish: true
 install:
-  - python bootstrap-buildout.py -c travis.cfg --setuptools-version=21.0.0
-  - bin/buildout -Nc travis.cfg
+  - virtualenv -p `which python` .
+  - bin/pip install -r requirements.txt
+  - bin/buildout -N buildout:download-cache=downloads code-analysis:return-status-codes=True annotate
+  - bin/buildout -N buildout:download-cache=downloads code-analysis:return-status-codes=True
+before_script:
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- firefox -v
 script:
   - bin/code-analysis
   - bin/test
 after_success:
   - bin/createcoverage
-  - pip install coveralls==0.5
+  - bin/pip install coverage
+  - bin/python -m coverage.pickle2json
+  - pip install coveralls
   - coveralls
-
-notifications:
-  email:
-    - bauer@starzel.de
