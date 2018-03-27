@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.1 (unreleased)
+1.1 (2018-03-27)
 ----------------
 
 - Add modification date to default fields
