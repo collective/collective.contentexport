@@ -120,6 +120,29 @@ You can filter the items that should be exported by passing a catalog-query:
     view = api.content.get_view('collective_contentexport_view', portal, request)
     view(export_type='json', portal_type='Document', query={'review_state': 'published', 'path': path})
 
+Here is a full example as a `BrowserView`:
+
+..  code-block:: python
+
+    # -*- coding: utf-8 -*-
+    from plone import api
+    from Products.Five import BrowserView
+
+
+    class ExportCurrentlyEditedNews(BrowserView):
+
+        def call(self):
+            portal = api.portal.get()
+            view = api.content.get_view(
+                'collective_contentexport_view', portal, self.request)
+
+            date_range = {'query': '2017/12/01', 'range': 'min'}
+            return view(
+                export_type='xlsx',
+                portal_type='News Item',
+                query={'modified': date_range},
+            )
+
 You can also extend the export.
 In the following example the value ``some_fieldname`` is being extracted from the object using the method ``_somehandler``.
 
@@ -133,7 +156,7 @@ In the following example the value ``some_fieldname`` is being extracted from th
     result = view(export_type='json', portal_type='Document', additional=additional)
 
 You can also override the default methods to modify the default behavior.
-In the following example the ``image`` from Images is being extracted using the method ``_get_imagename`` that only dumps the filename of the image:
+In the following example the ``image`` from Images is being extracted using the method ``_get_imagename`` that only dumps the filename of the image but does no longer export the binary data:
 
 ..  code-block:: python
 
@@ -149,7 +172,7 @@ In the following example the ``image`` from Images is being extracted using the 
 Compatability
 -------------
 
-collective.contentexport is tested to work in Plone 4.3, Plone 5 and PLone 5.1.
+collective.contentexport is tested to work in Plone 4.3, Plone 5 and Plone 5.1.
 
 
 Known Issues
