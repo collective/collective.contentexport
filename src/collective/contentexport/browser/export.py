@@ -530,7 +530,7 @@ class DXFields(BrowserView):
             class_name = field.__class__.__name__
             results.append({
                 'id': fieldname,
-                'title': '{0} ({1})'.format(translated_title, class_name),
+                'title': u'{0} ({1})'.format(translated_title, class_name),
                 'type': class_name
             })
         self.fields = sorted(results, key=itemgetter('title'))
