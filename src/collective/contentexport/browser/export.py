@@ -465,17 +465,14 @@ def get_url_for_relation(rel):
     if rel.isBroken():
         return
     catalog = api.portal.get_tool('portal_catalog')
-    brains = catalog(
-        path={'query': rel.to_path, 'depth': 0})
+    brains = catalog(path={'query': rel.to_path, 'depth': 0})
     if not brains:
         return
     brain = brains[0]
     if brain.portal_type == 'Image':
-        return '{0}/@@download/image'.format(
-            brain.getURL())
+        return '{0}/@@download/image'.format(brain.getURL())
     elif brain.portal_type == 'File':
-        return '{0}/@@download/file'.format(
-            brain.getURL())
+        return '{0}/@@download/file'.format(brain.getURL())
     else:
         return brain.getURL()
 
