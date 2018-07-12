@@ -77,6 +77,11 @@ def _modified(obj):
 def _parent_title(obj):
     return obj.__parent__.title
 
+
+def _grandparent_title(obj):
+    return obj.__parent__.__parent__.title
+
+
 # This is a dict of headername and method to get additional useful date
 # from the objects. This can also be used to override the getters fields with
 # the same name to use custom methods to get data.
@@ -164,6 +169,7 @@ class ExportView(BrowserView):
             'review_state': _review_state,
             'modified': _modified,
             'parent_title': _parent_title,
+            'grandparent_title': _grandparent_title,
         }
 
         if not blacklist:
