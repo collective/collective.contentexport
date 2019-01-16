@@ -44,6 +44,11 @@ if not HAS_MULTILINGUAL:
     else:
         HAS_MULTILINGUAL = True
 
+try:
+    from plone.formwidget.geolocation.geolocation import Geolocation
+    HAS_GEOLOCATION = True
+except ImportError:
+    HAS_GEOLOCATION = False
 
 _marker = []
 log = logging.getLogger(__name__)
@@ -320,6 +325,8 @@ class ExportView(BrowserView):
                 if isinstance(value, list) or isinstance(value, tuple):
                     value = pretty_join(value)
 
+                if HAS_GEOLOCATION and isinstance(value, Geolocation):
+                    value = value.__dict__
                 item_dict[fieldname] = value
 
             # Update the data with additional info or overridden getters
