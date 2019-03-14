@@ -24,6 +24,7 @@ import base64
 import json
 import logging
 import pkg_resources
+import six
 import tablib
 import zipfile
 
@@ -188,7 +189,7 @@ class ExportView(BrowserView):
             whitelist = []
         else:
             # only keep whitelisted items in ADDITIONAL_MAPPING
-            for key in self.ADDITIONAL_MAPPING.keys():
+            for key in list(self.ADDITIONAL_MAPPING.keys()):
                 if key not in whitelist:
                     self.ADDITIONAL_MAPPING.pop(key)
 
@@ -250,13 +251,15 @@ class ExportView(BrowserView):
     def export_file(self, result, portal_type, mimetype, extension):
         filename = '{0}_export.{1}'.format(portal_type, extension)
         with NamedTemporaryFile(mode='wb') as tmpfile:
+            if six.PY3 and isinstance(result, six.text_type):
+                result = result.encode('utf8')
             tmpfile.write(result)
             tmpfile.seek(0)
             self.request.response.setHeader('Content-Type', mimetype)
             self.request.response.setHeader(
                 'Content-Disposition',
                 'attachment; filename="{0}"'.format(filename))
-            return file(tmpfile.name).read()
+            return open(tmpfile.name, 'rb').read()
 
     def get_export_data(
         self,
@@ -396,7 +399,7 @@ class ExportView(BrowserView):
         zip_file.close()
         if not blobs_found:
             return 'No {0} found'.format(blob_type)
-        data = file(tmp_file.name).read()
+        data = open(tmp_file.name, 'rb').read()
         response = self.request.response
         response.setHeader('content-type', 'application/zip')
         response.setHeader('content-length', len(data))
@@ -504,6 +507,10 @@ def get_blob_url(value, brain, blob_format, fieldname):
         value = u'{0}/{1}'.format(brain.UID, filename)
     if blob_format == 'base64':
         value = base64.b64encode(value.data)
+        if six.PY3:
+            # in py3 base64 is binary.
+            # we want to export it so we need text
+            value = value.decode('utf8')
     return value
 
 
