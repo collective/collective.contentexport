@@ -213,6 +213,9 @@ class ExportView(BrowserView):
         dataset = tablib.Dataset()
         dataset.dict = data
 
+        if export_type == 'raw':
+            return dataset
+
         if export_type == 'xlsx':
             result = dataset.xlsx
             return self.export_file(
