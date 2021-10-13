@@ -5,6 +5,9 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- Also respect context for zip file exports of image and file fields. 
+  [fredvd]
+  
 - Add context for catalog search to allow local export.
   [thomasmassmann]
 

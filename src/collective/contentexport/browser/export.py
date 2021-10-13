@@ -364,6 +364,9 @@ class ExportView(BrowserView):
 
         catalog = api.portal.get_tool('portal_catalog')
         query = {'portal_type': portal_type}
+        query['path'] = {}
+        query['path']['query'] = '/'.join(self.context.getPhysicalPath())
+
         blobs_found = False
         if HAS_MULTILINGUAL and 'Language' in catalog.indexes():
             query['Language'] = 'all'
