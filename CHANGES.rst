@@ -5,7 +5,8 @@ Changelog
 1.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add context for catalog search to allow local export.
+  [thomasmassmann]
 
 
 1.1 (2018-03-27)

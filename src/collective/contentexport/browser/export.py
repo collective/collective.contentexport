@@ -282,6 +282,10 @@ class ExportView(BrowserView):
                 'Language' in catalog.indexes():
             query['Language'] = 'all'
 
+        if 'path' not in query:
+            query['path'] = {}
+            query['path']['query'] = '/'.join(self.context.getPhysicalPath())
+
         brains = catalog(query)
         for brain in brains:
             obj = brain.getObject()
@@ -414,7 +418,11 @@ class ExportView(BrowserView):
         for fti in portal_types.listTypeInfo():
             if not IDexterityFTI.providedBy(fti):
                 continue
-            number = len(catalog(portal_type=fti.id))
+            query = {}
+            query['portal_type'] = fti.id
+            query['path'] = {}
+            query['path']['query'] = '/'.join(self.context.getPhysicalPath())
+            number = len(catalog(query))
             if number >= 1:
                 results.append({
                     'number': number,
